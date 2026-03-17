@@ -1,6 +1,10 @@
-# rememberit
+<p align="center">
+  <img src="logo.svg" width="96" height="96" alt="rememberit logo"/>
+</p>
 
-> AI-native terminal memory and reminder system, powered by Ollama.
+<h1 align="center">rememberit</h1>
+
+<p align="center">AI-native terminal memory and reminder system, powered by Ollama.</p>
 
 Save anything from your terminal — commands, notes, URLs, facts, reminders — and recall it later with natural language. Everything runs locally. No cloud, no accounts.
 
