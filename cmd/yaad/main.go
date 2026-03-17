@@ -379,6 +379,12 @@ func configCmd(rc *rcfile.Config, rcPath string) *cobra.Command {
 				}
 				fmt.Printf("created %s\n", rcPath)
 				fmt.Println("edit it with your preferred text editor to configure yaad.")
+				fmt.Println()
+				fmt.Println("tip: yaad can remind you about memories. run `yaad daemon` (or add it to your shell) to enable reminders.")
+				fmt.Println("     learn more: https://github.com/KunalSin9h/yaad?tab=readme-ov-file#reminders")
+				fmt.Println()
+				fmt.Println("to start the daemon automatically, add this to your ~/.bashrc:")
+				fmt.Println(`  echo "" >> ~/.bashrc && echo "yaad daemon &" >> ~/.bashrc`)
 				return nil
 			},
 		},
