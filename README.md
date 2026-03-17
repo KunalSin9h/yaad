@@ -1,19 +1,19 @@
-rememberit
+lore
 
-> I AI-native terminal memory and reminder system, powered by Ollama.
+> An AI-native terminal memory and reminder system, powered by Ollama.
 
 Save anything from your terminal — commands, notes, URLs, facts, reminders — and recall it later with natural language. Everything runs locally. No cloud, no accounts.
 
 ```bash
 # Save a command with context
 lore add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
-  --for "rememberit CLI build session"
+  --for "lore CLI build session"
 
 # Set a time-based reminder
 lore add "book conference ticket" --remind "in 30 minutes"
 
 # Ask anything
-lore ask "which claude session was I building rememberit in?"
+lore ask "which claude session was I building lore in?"
 lore ask "do I have anything due tonight?"
 ```
 
@@ -48,14 +48,14 @@ ollama pull llama3.2:3b        # reasoning (or any chat model you prefer)
 ## Installation
 
 ```bash
-go install github.com/kunalsin9h/lore/cmd/rememberit@latest
+go install github.com/kunalsin9h/lore/cmd/lore@latest
 ```
 
 Or build from source:
 
 ```bash
 git clone https://github.com/kunalsin9h/lore
-cd rememberit
+cd lore
 make install
 ```
 
@@ -80,7 +80,7 @@ Examples:
 ```bash
 # A command you want to resume later
 lore add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
-  --for "rememberit build session"
+  --for "lore build session"
 
 # A time-sensitive reminder
 lore add "book conference ticket" --remind "in 30 minutes"
@@ -97,7 +97,7 @@ lore add "https://pkg.go.dev/modernc.org/sqlite" \
 ### Query your memories
 
 ```bash
-lore ask "which claude session was for building rememberit?"
+lore ask "which claude session was for building lore?"
 lore ask "what was the staging postgres port?"
 lore ask "do I have anything due tonight?"
 ```
@@ -151,13 +151,13 @@ precmd() { lore check }
 
 ```bash
 lore daemon install          # writes ~/.config/systemd/user/lore.service
-systemctl --user enable --now rememberit
+systemctl --user enable --now lore
 ```
 
 Check status:
 
 ```bash
-systemctl --user status rememberit
+systemctl --user status lore
 ```
 
 ---
@@ -193,8 +193,8 @@ reminder.poll_interval = 30s
 CLI flags override the rc file for a single invocation:
 
 ```bash
-rememberit --chat-model mistral ask "what was that command?"
-rememberit --ollama-url http://192.168.1.5:11434 add "remote ollama note"
+lore --chat-model mistral ask "what was that command?"
+lore --ollama-url http://192.168.1.5:11434 add "remote ollama note"
 ```
 
 Config commands work on `~/.lorerc` directly:
@@ -243,7 +243,7 @@ Swapping any layer requires implementing one interface. For example, to use Chro
 ## Project structure
 
 ```
-rememberit/
+lore/
 ├── cmd/lore/main.go          # entry point + dependency wiring
 ├── internal/
 │   ├── domain/                     # Memory, MemoryType, errors — no deps
