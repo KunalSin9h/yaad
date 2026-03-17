@@ -8,13 +8,13 @@ linters:
     - ineffassign
     - staticcheck
     - unused
-
-linters-settings:
-  errcheck:
-    check-blank: false   # fmt.Scanln in CLI prompts intentionally ignored
+  settings:
+    errcheck:
+      check-blank: false   # fmt.Scanln in CLI prompts intentionally ignored
 
 issues:
-  exclude-rules:
-    # Test files are allowed to have unused functions and looser error handling.
-    - path: "_test\\.go"
-      linters: [errcheck]
+  exclusions:
+    rules:
+      # Test files are allowed to have unused functions and looser error handling.
+      - path: "_test\\.go"
+        linters: [errcheck]
