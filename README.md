@@ -1,6 +1,7 @@
 ## yaad
 
 > AI-native memory, recall and reminder on the terminal — locally with Ollama.
+> [yaad website](https://yaad.knl.co.in/)**
 
 Save anything from your terminal — commands, notes, URLs, facts, reminders — and recall it later with natural language. Everything runs locally. No cloud, no accounts.
 
