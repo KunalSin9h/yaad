@@ -29,7 +29,7 @@ func IsAvailable() bool {
 }
 
 func (n *NotifySend) Notify(ctx context.Context, m *domain.Memory) error {
-	title := fmt.Sprintf("rememberit [%s]", m.Type)
+	title := fmt.Sprintf("lore [%s]", m.Type)
 	body := m.Content
 	if m.ForLabel != "" {
 		body += "\n" + m.ForLabel

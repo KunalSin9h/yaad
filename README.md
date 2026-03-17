@@ -19,6 +19,21 @@ lore ask "do I have anything due tonight?"
 
 ---
 
+## Table of Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Reminders](#reminders)
+- [Architecture](#architecture)
+- [Project structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
 ## Features
 
 - **Query-first** — natural language search powered by local embeddings + LLM
@@ -58,6 +73,61 @@ git clone https://github.com/kunalsin9h/lore
 cd lore
 make install
 ```
+
+---
+
+## Configuration
+
+Configuration is read from `~/.lorerc`. Create it with defaults:
+
+```bash
+lore config init
+```
+
+This generates a commented file you can edit directly:
+
+```ini
+# lore configuration
+
+# Ollama server
+ollama.url           = http://localhost:11434
+
+# Embedding model — nomic-embed-text, mxbai-embed-large, all-minilm
+ollama.embed_model   = nomic-embed-text
+
+# Chat model — llama3.2:3b, mistral, gemma2:2b, phi3
+ollama.chat_model    = llama3.2:3b
+
+# Reminder daemon poll interval
+reminder.poll_interval = 30s
+```
+
+**Priority: built-in defaults < `~/.lorerc` < CLI flags**
+
+CLI flags override the rc file for a single invocation:
+
+```bash
+lore --chat-model mistral ask "what was that command?"
+lore --ollama-url http://192.168.1.5:11434 add "remote ollama note"
+```
+
+Config commands work on `~/.lorerc` directly:
+
+```bash
+lore config list                            # show all set values
+lore config set ollama.chat_model mistral   # update a value
+lore config get ollama.chat_model           # read a value
+lore config path                            # print rc file location
+```
+
+| Key | Default |
+|---|---|
+| `ollama.url` | `http://localhost:11434` |
+| `ollama.embed_model` | `nomic-embed-text` |
+| `ollama.chat_model` | `llama3.2:3b` |
+| `reminder.poll_interval` | `30s` |
+
+Data is stored at `$XDG_DATA_HOME/lore/memories.db` (defaults to `~/.local/share/lore/memories.db`).
 
 ---
 
@@ -159,61 +229,6 @@ Check status:
 ```bash
 systemctl --user status lore
 ```
-
----
-
-## Configuration
-
-Configuration is read from `~/.lorerc`. Create it with defaults:
-
-```bash
-lore config init
-```
-
-This generates a commented file you can edit directly:
-
-```ini
-# lore configuration
-
-# Ollama server
-ollama.url           = http://localhost:11434
-
-# Embedding model — nomic-embed-text, mxbai-embed-large, all-minilm
-ollama.embed_model   = nomic-embed-text
-
-# Chat model — llama3.2:3b, mistral, gemma2:2b, phi3
-ollama.chat_model    = llama3.2:3b
-
-# Reminder daemon poll interval
-reminder.poll_interval = 30s
-```
-
-**Priority: built-in defaults < `~/.lorerc` < CLI flags**
-
-CLI flags override the rc file for a single invocation:
-
-```bash
-lore --chat-model mistral ask "what was that command?"
-lore --ollama-url http://192.168.1.5:11434 add "remote ollama note"
-```
-
-Config commands work on `~/.lorerc` directly:
-
-```bash
-lore config list                            # show all set values
-lore config set ollama.chat_model mistral   # update a value
-lore config get ollama.chat_model           # read a value
-lore config path                            # print rc file location
-```
-
-| Key | Default |
-|---|---|
-| `ollama.url` | `http://localhost:11434` |
-| `ollama.embed_model` | `nomic-embed-text` |
-| `ollama.chat_model` | `llama3.2:3b` |
-| `reminder.poll_interval` | `30s` |
-
-Data is stored at `$XDG_DATA_HOME/lore/memories.db` (defaults to `~/.local/share/lore/memories.db`).
 
 ---
 

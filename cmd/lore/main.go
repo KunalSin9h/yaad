@@ -85,12 +85,7 @@ Examples:
 
 			aiClient := ollama.New(ollamaURL, embedModel, chatModel)
 
-			var notif ports.NotifierPort
-			if notifier.IsAvailable() {
-				notif = notifier.NewNotifySend()
-			} else {
-				notif = notifier.NewStdout()
-			}
+			notif := notifier.NewCLI()
 
 			memorySvc = app.NewMemoryService(db.Store, aiClient, timeparser.New())
 			reminderSvc = app.NewReminderService(db.Store, notif)
