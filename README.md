@@ -55,7 +55,7 @@ yaad ask "do I have anything due tonight?"
 Pull the required models once:
 
 ```bash
-ollama pull nomic-embed-text   # embeddings
+ollama pull mxbai-embed-large  # embeddings
 ollama pull llama3.2:3b        # reasoning (or any chat model you prefer)
 ```
 

@@ -25,8 +25,8 @@ const DefaultConfig = `# yaad configuration
 ollama.url           = http://localhost:11434
 
 # Model used to generate embeddings for semantic search.
-# Recommended: nomic-embed-text, mxbai-embed-large, all-minilm
-ollama.embed_model   = nomic-embed-text
+# Recommended: mxbai-embed-large, nomic-embed-text, all-minilm
+ollama.embed_model   = mxbai-embed-large
 
 # Model used for type detection, tag extraction, and query answering.
 # Any chat-capable Ollama model works. Smaller = faster.

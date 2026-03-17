@@ -16,8 +16,8 @@ yaad config init
 # Ollama server
 ollama.url           = http://localhost:11434
 
-# Embedding model — nomic-embed-text, mxbai-embed-large, all-minilm
-ollama.embed_model   = nomic-embed-text
+# Embedding model — mxbai-embed-large, nomic-embed-text, all-minilm
+ollama.embed_model   = mxbai-embed-large
 
 # Chat model — llama3.2:3b, mistral, gemma2:2b, phi3
 ollama.chat_model    = llama3.2:3b
@@ -38,7 +38,7 @@ notifier = cli
 | Key | Default | Description |
 |---|---|---|
 | `ollama.url` | `http://localhost:11434` | Ollama server URL |
-| `ollama.embed_model` | `nomic-embed-text` | Model for generating embeddings |
+| `ollama.embed_model` | `mxbai-embed-large` | Model for generating embeddings |
 | `ollama.chat_model` | `llama3.2:3b` | Model for query answering and type detection |
 | `reminder.poll_interval` | `30s` | How often the daemon polls for due reminders |
 | `notifier` | `cli` | Notifier adapter(s), comma-separated |

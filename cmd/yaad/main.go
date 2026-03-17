@@ -80,7 +80,7 @@ Examples:
 
 			// Resolve: flag > rc file > built-in default.
 			ollamaURL := resolve(cmd, "ollama-url", rc, "ollama.url", "http://localhost:11434")
-			embedModel := resolve(cmd, "embed-model", rc, "ollama.embed_model", "nomic-embed-text")
+			embedModel := resolve(cmd, "embed-model", rc, "ollama.embed_model", "mxbai-embed-large")
 			chatModel := resolve(cmd, "chat-model", rc, "ollama.chat_model", "llama3.2:3b")
 
 			aiClient := ollama.New(ollamaURL, embedModel, chatModel)

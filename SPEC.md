@@ -140,7 +140,7 @@ PROMPT_COMMAND="yaad check; $PROMPT_COMMAND"
 
 ```bash
 yaad config set ollama.url http://localhost:11434
-yaad config set ollama.embed_model nomic-embed-text
+yaad config set ollama.embed_model mxbai-embed-large
 yaad config set ollama.chat_model llama3.2:3b
 yaad config get ollama.url
 yaad config list
@@ -284,7 +284,7 @@ CREATE INDEX idx_memories_created_at ON memories(created_at DESC);
 ### Models (defaults, all configurable)
 | Purpose | Default Model |
 |---|---|
-| Embeddings | `nomic-embed-text` |
+| Embeddings | `mxbai-embed-large` |
 | Chat / reasoning | `llama3.2:3b` |
 
 ---
@@ -316,7 +316,7 @@ Data stored at `~/.local/share/yaad/memories.db`.
 | Key | Default |
 |---|---|
 | `ollama.url` | `http://localhost:11434` |
-| `ollama.embed_model` | `nomic-embed-text` |
+| `ollama.embed_model` | `mxbai-embed-large` |
 | `ollama.chat_model` | `llama3.2:3b` |
 | `notify.method` | `auto` (detect at runtime) |
 | `reminder.poll_interval` | `30s` |
