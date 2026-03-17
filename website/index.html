@@ -53,27 +53,27 @@
       position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 2rem;
-      height: 52px;
+      height: 64px;
       background: rgba(12,11,9,.92);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
     .nav-logo {
       font-family: "Baloo 2", "Manrope", sans-serif;
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       font-weight: 800;
       color: var(--text);
       letter-spacing: -.5px;
     }
     .nav-logo .tilde { color: var(--dim); font-weight: 400; }
-    .nav-links { display: flex; gap: 2rem; font-size: .82rem; font-weight: 500; letter-spacing: .01em; }
+    .nav-links { display: flex; gap: 2rem; font-size: .86rem; font-weight: 600; letter-spacing: .01em; }
     .nav-links a { color: var(--muted); transition: color .15s; }
     .nav-links a:hover { color: var(--text); text-decoration: none; }
     .nav-gh {
       display: flex; align-items: center; gap: .4rem;
       padding: .3rem .9rem;
       border: 1px solid var(--border2);
-      font-size: .8rem; font-weight: 600; letter-spacing: .02em;
+      font-size: .82rem; font-weight: 600; letter-spacing: .02em;
       color: var(--text);
       background: var(--bg3);
       transition: border-color .15s, background .15s;
@@ -83,23 +83,26 @@
 
     /* ─── HERO ─── */
     .hero {
-      max-width: 900px; margin: 0 auto;
-      padding: 5rem 2rem 4.5rem;
+      max-width: 1000px; margin: 0 auto;
+      padding: 3rem 2rem 4rem;
       text-align: center;
       position: relative;
     }
     .hero-bg {
       position: absolute; inset: 0;
-      background-image: radial-gradient(circle, rgba(46,43,38,.7) 1px, transparent 1px);
-      background-size: 28px 28px;
+      background-image: radial-gradient(circle, rgba(46,43,38,.55) 1px, transparent 1px);
+      background-size: 32px 32px;
       pointer-events: none;
-      mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 30%, transparent 100%);
+      mask-image: radial-gradient(ellipse 90% 80% at 50% 20%, black 20%, transparent 100%);
     }
     .hero-glow {
       position: absolute;
-      top: 50px; left: 50%; transform: translateX(-50%);
-      width: 600px; height: 300px;
-      background: radial-gradient(ellipse, rgba(74,222,128,.06) 0%, transparent 70%);
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 900px; height: 500px;
+      background:
+        radial-gradient(ellipse 60% 50% at 40% 40%, rgba(74,222,128,.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 65% 50%, rgba(96,165,250,.05) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 50% 10%, rgba(251,191,36,.04) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero > * { position: relative; }
@@ -109,76 +112,75 @@
       flex-direction: column;
       align-items: center;
       gap: 1rem;
-      margin-bottom: 3.75rem;
+      margin-bottom: 2.5rem;
     }
     .hero-wordmark {
       font-family: "Baloo 2", "Manrope", sans-serif;
-      font-size: clamp(3.2rem, 10vw, 7rem);
+      font-size: clamp(6rem, 22vw, 14rem);
       font-weight: 800;
-      letter-spacing: -.02em;
-      line-height: .95;
+      letter-spacing: -.04em;
+      line-height: .88;
       background: linear-gradient(120deg, #9cffb0 0%, #7dd3fc 40%, #fbbf24 70%, #fb7185 100%);
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: 0 12px 40px rgba(74,222,128,.12);
+      filter: drop-shadow(0 0 60px rgba(74,222,128,.12));
     }
-    .hero-orbit {
-      width: min(520px, 80vw);
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: .6rem;
+    .hero-tagline {
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: clamp(.65rem, 1.4vw, .85rem);
+      color: var(--dim);
+      letter-spacing: .22em;
+      text-transform: uppercase;
     }
-    .orbit-tile {
-      height: 42px;
-      border-radius: 16px;
-      border: 1px solid var(--border2);
-      background: linear-gradient(135deg, rgba(74,222,128,.14), rgba(96,165,250,.1));
+    .hero-types {
       display: flex;
       align-items: center;
+      gap: .55rem;
+      flex-wrap: wrap;
       justify-content: center;
-      color: var(--text);
-      font-size: 1.05rem;
-      font-weight: 700;
     }
-    .orbit-tile.alt {
-      background: linear-gradient(135deg, rgba(251,191,36,.18), rgba(251,113,133,.12));
+    .type-chip {
+      font-family: "SF Mono", monospace;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      padding: .25rem .75rem;
+      border: 1px solid currentColor;
+      opacity: .55;
+      transition: opacity .15s;
     }
+    .type-chip:hover { opacity: 1; }
+    .type-chip.t-green  { color: var(--green); }
+    .type-chip.t-amber  { color: var(--amber); }
+    .type-chip.t-blue   { color: var(--blue); }
+    .type-chip.t-rose   { color: var(--rose); }
+    .type-chip.t-cyan   { color: var(--cyan); }
 
     .hero-pill {
-      display: inline-flex; align-items: center; gap: .5rem;
-      padding: .25rem .85rem;
-      border: 1px solid var(--border2);
-      border-radius: 999px;
-      font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 1.75rem;
-      background: var(--bg3);
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .72rem; font-weight: 500; letter-spacing: .03em;
+      color: var(--dim);
+      margin-bottom: 1.1rem;
     }
-    .hero-pill .blink {
-      width: 6px; height: 6px; border-radius: 50%;
-      background: var(--green);
-      animation: blink 2s ease-in-out infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; } 50% { opacity: .3; }
-    }
+    .hero-pill .pill-sep { color: var(--border2); margin: 0 .1rem; }
+    .hero-pill img { width: 20px; height: 20px; object-fit: contain; filter: invert(1); opacity: .45; vertical-align: middle; }
 
     h1 {
       font-family: "Baloo 2", "Manrope", sans-serif;
-      font-size: clamp(2.3rem, 5vw, 3.6rem);
+      font-size: clamp(2.6rem, 6vw, 4.4rem);
       font-weight: 800;
-      line-height: 1.15;
+      line-height: 1.1;
       letter-spacing: -.04em;
-      margin-bottom: 1.1rem;
+      margin-bottom: 1.25rem;
       color: var(--text);
     }
     h1 .hi { color: var(--green); }
     h1 .dim { color: var(--muted); }
 
     .hero-sub {
-      font-size: 1.1rem; color: var(--muted);
-      max-width: 540px; margin: 0 auto 2.75rem;
-      line-height: 1.8;
+      font-size: 1.05rem; color: var(--muted);
+      max-width: 520px; margin: 0 auto 2rem;
+      line-height: 1.75;
       font-weight: 400;
     }
 
@@ -284,6 +286,16 @@
       text-transform: uppercase;
       margin-bottom: .9rem;
       opacity: .85;
+    }
+    .label svg {
+      width: 14px;
+      height: 14px;
+      margin-right: .5rem;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
     .label::before { content: "[ "; }
     .label::after  { content: " ]"; }
@@ -496,9 +508,10 @@
       nav { padding: 0 1rem; }
       .nav-links { display: none; }
       section { padding: 3.5rem 1.25rem; }
-      h1 { font-size: 1.6rem; }
-      .hero-art { margin-bottom: 2.5rem; }
-      .hero-orbit { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .hero { padding: 4rem 1.25rem 4rem; }
+      h1 { font-size: 2rem; }
+      .hero-art { margin-bottom: 2.5rem; gap: 1rem; }
+      .hero-wordmark { font-size: clamp(5rem, 28vw, 7rem); }
     }
 
     .sr-only {
@@ -533,29 +546,16 @@
 
 <!-- ─── HERO ─── -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-glow"></div>
-
-  <div class="hero-art">
-    <div class="hero-wordmark">yaad</div>
-    <div class="hero-orbit" aria-hidden="true">
-      <div class="orbit-tile">⌘</div>
-      <div class="orbit-tile alt">✦</div>
-      <div class="orbit-tile">⏱</div>
-      <div class="orbit-tile alt">∞</div>
-      <div class="orbit-tile">✉︎</div>
-    </div>
-  </div>
-
   <div class="hero-pill">
-    <span class="blink"></span>
-    powered by ollama — runs fully local
+    <!-- Ollama logo -->
+    <img src="https://ollama.com/public/ollama.png"/>
+    100% local
   </div>
 
-  <h1>Give your terminal a<br /><span class="hi">playful memory</span>.</h1>
+  <h1>Your terminal,<br /><span class="hi">finally has memory</span>.</h1>
   <p class="hero-sub">
-    Save commands, notes, URLs, facts, and reminders with one line.
-    Recall anything with natural language, right where you work.
+    Save commands, notes, URLs, facts, and reminders right in the terminal.
+    Recall anything later with natural language. Fully local with Ollama.
   </p>
   <div class="hero-actions">
     <a href="#install" class="btn-primary">Get started →</a>
@@ -573,15 +573,19 @@
       <span class="terminal-title">~/dev — zsh</span>
     </div>
     <div class="terminal-body">
-      <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644"</span> <span class="t-flag">--for</span> <span class="t-str">"yaad build session"</span></div>
-      <div class="t-out">  ✓ saved &nbsp;[command] yaad build session</div>
+      <div class="t-out">  <span style="color:var(--dim)">── save things you can't memorise ───────────</span></div>
+      <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"claude session id for db migration is 3fa2c891-7b4e....."</span></div>
+      <div class="t-out">  ✓ saved &nbsp;[fact]</div>
       <span class="t-blank"></span>
-      <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"book conference ticket"</span> <span class="t-flag">--remind</span> <span class="t-str">"in 30 minutes"</span></div>
-      <div class="t-out">  ✓ saved &nbsp;[reminder] due in 30 minutes</div>
+      <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"do some situps"</span> <span class="t-flag">--remind</span> <span class="t-str">"in 10 minutes"</span></div>
+      <div class="t-out">  ✓ saved &nbsp;[reminder] &nbsp;due in 10 minutes</div>
       <span class="t-blank"></span>
-      <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"which claude session was I building yaad in?"</span></div>
-      <div class="t-ans">  You were using claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644</div>
-      <div class="t-ans">  tagged as: yaad build session</div>
+      <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"prod deploy needs VPN + sudo on bastion-01.internal"</span></div>
+      <div class="t-out">  ✓ saved &nbsp;[note]</div>
+      <span class="t-blank"></span>
+      <div class="t-out">  <span style="color:var(--dim)">── recall with plain english, weeks later ───</span></div>
+      <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"claude session id for db migration?"</span></div>
+      <div class="t-ans">  3fa2c891-7b4e-4d1a-9f3c-2e8b5a6d0c19</div>
     </div>
   </div>
 </section>
@@ -625,9 +629,12 @@
 <!-- ─── FEATURES ─── -->
 <section id="features">
   <div class="section-inner">
-    <span class="label green">features</span>
+    <span class="label green">
+      <svg viewBox="0 0 24 24"><path d="M12 4l2.2 4.4L19 9l-3.5 3.3.9 4.7-4.4-2.4-4.4 2.4.9-4.7L5 9l4.8-.6z"></path></svg>
+      features
+    </span>
     <h2>Everything you need,<br />nothing you don't.</h2>
-    <p class="section-lead">Built for developers who live in the terminal and treat their privacy seriously.</p>
+    <p class="section-lead">Query-first memory that stays local and fits how developers actually work.</p>
 
     <div class="features-grid">
       <div class="feature-card c-green">
@@ -639,8 +646,8 @@
           </svg>
         </div>
         <span class="sr-only">recall</span>
-        <h3>Natural language search</h3>
-        <p>Ask in plain English. Local embeddings + LLM reasoning find exactly what you saved, even weeks later.</p>
+        <h3>Query-first memory</h3>
+        <p>Ask in plain English. Local embeddings + LLM reasoning find what you saved, even weeks later.</p>
       </div>
       <div class="feature-card c-amber">
         <div class="feature-icon" aria-hidden="true">
@@ -652,7 +659,7 @@
         </div>
         <span class="sr-only">privacy</span>
         <h3>Fully local &amp; private</h3>
-        <p>All AI runs via Ollama on your machine. Zero cloud, zero accounts, zero telemetry. Your data never leaves.</p>
+        <p>All AI runs via Ollama on your machine. No cloud, no accounts, no data leaving your laptop.</p>
       </div>
       <div class="feature-card c-rose">
         <div class="feature-icon" aria-hidden="true">
@@ -662,8 +669,8 @@
           </svg>
         </div>
         <span class="sr-only">reminders</span>
-        <h3>Smart time parsing</h3>
-        <p>Say <code>"in 30 minutes"</code>, <code>"tomorrow 9am"</code>, or <code>"Friday 3pm"</code>. yaad turns it into a real deadline.</p>
+        <h3>Smart reminders</h3>
+        <p>Parse <code>"in 30 minutes"</code>, <code>"tomorrow 9am"</code>, or <code>"Friday 3pm"</code> into real deadlines.</p>
       </div>
       <div class="feature-card c-blue">
         <div class="feature-icon" aria-hidden="true">
@@ -674,8 +681,8 @@
           </svg>
         </div>
         <span class="sr-only">context</span>
-        <h3>Auto-enriched metadata</h3>
-        <p>Every memory captures cwd, hostname, and timestamp. AI auto-detects type and extracts tags for you.</p>
+        <h3>Rich metadata</h3>
+        <p>Every memory captures context, cwd, hostname, and timestamp. AI auto-detects type and tags.</p>
       </div>
       <div class="feature-card c-purple">
         <div class="feature-icon" aria-hidden="true">
@@ -687,7 +694,7 @@
         </div>
         <span class="sr-only">resilience</span>
         <h3>Offline-safe</h3>
-        <p>Memories save even when Ollama is unavailable. AI enrichment degrades gracefully — your data is never lost.</p>
+        <p>Memories save even when Ollama is down. AI enrichment degrades gracefully, never blocking saves.</p>
       </div>
       <div class="feature-card c-cyan">
         <div class="feature-icon" aria-hidden="true">
@@ -698,8 +705,8 @@
           </svg>
         </div>
         <span class="sr-only">architecture</span>
-        <h3>Fully extensible</h3>
-        <p>Ports &amp; Adapters design. Swap the storage backend, AI provider, or notifier by implementing one interface.</p>
+        <h3>Ports &amp; Adapters</h3>
+        <p>Swap storage, AI provider, or notifier by implementing a single interface.</p>
       </div>
     </div>
   </div>
@@ -708,7 +715,10 @@
 <!-- ─── INSTALL ─── -->
 <section id="install">
   <div class="section-inner">
-    <span class="label amber">installation</span>
+    <span class="label amber">
+      <svg viewBox="0 0 24 24"><path d="M12 4v10"></path><path d="M8 10l4 4 4-4"></path><rect x="4" y="16" width="16" height="4" rx="1"></rect></svg>
+      installation
+    </span>
     <h2>Up and running in minutes.</h2>
     <p class="section-lead">Requires Go 1.21+ and Ollama running locally.</p>
 
@@ -752,7 +762,10 @@
 <!-- ─── USAGE ─── -->
 <section id="usage">
   <div class="section-inner">
-    <span class="label blue">usage</span>
+    <span class="label blue">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"></path><path d="M7 9l3 3-3 3"></path><path d="M12 15h5"></path></svg>
+      usage
+    </span>
     <h2>A command for every moment.</h2>
     <p class="section-lead">Five memory types, auto-detected by AI: <code>command</code> · <code>note</code> · <code>url</code> · <code>fact</code> · <code>reminder</code></p>
 
@@ -783,25 +796,16 @@
       </div>
     </div>
 
-    <pre><span class="c"># save a command you'll want to resume</span>
-yaad add <span class="s">"claude --resume 17a43487"</span> <span class="k">--for</span> <span class="s">"yaad build session"</span>
-
-<span class="c"># a fact with tags</span>
-yaad add <span class="s">"staging postgres is on port 5433"</span> <span class="k">--tag</span> postgres <span class="k">--tag</span> staging
-
-<span class="c"># a time-sensitive reminder</span>
-yaad add <span class="s">"submit PR for review"</span> <span class="k">--remind</span> <span class="s">"tomorrow 9am"</span>
-
-<span class="c"># recall anything naturally</span>
-yaad ask <span class="s">"what was the staging postgres port?"</span>
-yaad ask <span class="s">"do I have anything due tonight?"</span></pre>
   </div>
 </section>
 
 <!-- ─── REMINDERS ─── -->
 <section id="reminders">
   <div class="section-inner">
-    <span class="label rose">reminders</span>
+    <span class="label rose">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"></circle><path d="M12 8v4l3 2"></path></svg>
+      reminders
+    </span>
     <h2>Never miss a deadline.</h2>
     <p class="section-lead">Two ways to surface reminders — pick what fits your workflow.</p>
 
@@ -838,7 +842,10 @@ systemctl --user status yaad</pre>
 <!-- ─── CTA ─── -->
 <section id="cta">
   <div class="cta-inner">
-    <span class="label purple" style="justify-content:center;margin-bottom:1.25rem">open source</span>
+    <span class="label purple" style="justify-content:center;margin-bottom:1.25rem">
+      <svg viewBox="0 0 24 24"><path d="M8 6h8"></path><path d="M6 8v8"></path><path d="M18 8v8"></path><path d="M8 18h8"></path></svg>
+      open source
+    </span>
     <h2>Start remembering<br />everything.</h2>
     <p>One command. All local. MIT licensed.</p>
     <div class="hero-actions" style="justify-content:center">
