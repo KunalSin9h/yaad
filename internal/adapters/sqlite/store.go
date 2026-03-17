@@ -53,10 +53,18 @@ func (s *Store) Save(ctx context.Context, m *domain.Memory) error {
 }
 
 func (s *Store) GetByID(ctx context.Context, id string) (*domain.Memory, error) {
+	// ULIDs are 26 chars. Accept a prefix (e.g. the 10-char short ID shown
+	// by `lore add`) and match the first row whose ID starts with it.
+	col := "id = ?"
+	arg := id
+	if len(id) < 26 {
+		col = "id LIKE ?"
+		arg = id + "%"
+	}
 	row := s.db.QueryRowContext(ctx, `
 		SELECT id, content, for_label, type, tags, working_dir, hostname,
 		       created_at, remind_at, reminded_at, embedding
-		FROM memories WHERE id = ?`, id)
+		FROM memories WHERE `+col+` LIMIT 1`, arg)
 	return scanRow(row)
 }
 
@@ -102,7 +110,13 @@ func (s *Store) List(ctx context.Context, filter domain.ListFilter) ([]*domain.M
 }
 
 func (s *Store) Delete(ctx context.Context, id string) error {
-	res, err := s.db.ExecContext(ctx, "DELETE FROM memories WHERE id = ?", id)
+	col := "id = ?"
+	arg := id
+	if len(id) < 26 {
+		col = "id LIKE ?"
+		arg = id + "%"
+	}
+	res, err := s.db.ExecContext(ctx, "DELETE FROM memories WHERE "+col, arg)
 	if err != nil {
 		return err
 	}
