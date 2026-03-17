@@ -17,7 +17,7 @@ import (
 type AddRequest struct {
 	Content    string
 	ForLabel   string
-	RemindExpr string           // natural language, e.g. "in 30 minutes"
+	RemindExpr string            // natural language, e.g. "in 30 minutes"
 	TypeHint   domain.MemoryType // overrides AI detection when non-empty
 	ExtraTags  []string          // user-provided tags merged with AI tags
 }
@@ -34,8 +34,9 @@ func NewMemoryService(store ports.StoragePort, ai ports.AIPort, timer ports.Time
 }
 
 // Add creates and persists a new memory.
-// AI enrichment (embedding, type detection, tag extraction) runs in parallel
-// and is non-fatal — the memory is saved even if Ollama is unavailable.
+// AI enrichment (embedding, type detection, tag extraction, entity extraction)
+// runs in parallel and is non-fatal — the memory is saved even if Ollama is
+// unavailable.
 func (s *MemoryService) Add(ctx context.Context, req AddRequest) (*domain.Memory, error) {
 	now := time.Now()
 
@@ -116,24 +117,66 @@ func (s *MemoryService) Add(ctx context.Context, req AddRequest) (*domain.Memory
 	if err := s.store.Save(ctx, m); err != nil {
 		return nil, fmt.Errorf("save memory: %w", err)
 	}
+
+	// Extract and persist entities after the memory is saved.
+	// Non-blocking: entity extraction failure never aborts the add.
+	go func() {
+		entities, err := s.ai.ExtractEntities(context.Background(), req.Content)
+		if err != nil || len(entities) == 0 {
+			return
+		}
+		if err := s.store.SaveEntities(context.Background(), m.ID, entities); err != nil {
+			fmt.Fprintf(os.Stderr, "warn: save entities: %v\n", err)
+		}
+	}()
+
 	return m, nil
 }
 
-// Ask answers a natural language question using semantic search + LLM.
+// Ask answers a natural language question using hybrid retrieval + optional reranking.
+//
+// Retrieval pipeline:
+//  1. HyDE: expand the question into a hypothetical answer, embed that.
+//  2. FindHybrid: merge BM25 (FTS5) and cosine similarity via RRF.
+//  3. Rerank: cross-encoder re-scores the top candidates (if configured).
+//  4. Answer: LLM synthesises a response from the top memories.
 func (s *MemoryService) Ask(ctx context.Context, question string) (string, error) {
-	emb, err := s.ai.Embed(ctx, question)
+	// Step 1: HyDE — embed a hypothetical answer instead of the raw question.
+	// Falls back to the original question when Ollama is unavailable.
+	queryText, err := s.ai.ExpandQuery(ctx, question)
+	if err != nil {
+		queryText = question
+	}
+
+	emb, err := s.ai.Embed(ctx, queryText)
 	if err != nil {
 		return "", fmt.Errorf("embed question: %w", err)
 	}
 
-	memories, err := s.store.FindSimilar(ctx, emb, 5)
+	// Step 2: Hybrid BM25 + vector retrieval with RRF fusion.
+	// Fetch a larger pool (10) before reranking down to 5.
+	memories, err := s.store.FindHybrid(ctx, question, emb, 10)
 	if err != nil {
-		return "", fmt.Errorf("find similar: %w", err)
+		return "", fmt.Errorf("find hybrid: %w", err)
 	}
 	if len(memories) == 0 {
 		return "No relevant memories found.", nil
 	}
 
+	// Step 3: Rerank — cross-encoder re-orders candidates by true relevance.
+	// No-op when rerank model is not configured; never blocks on error.
+	memories, err = s.ai.Rerank(ctx, question, memories)
+	if err != nil {
+		// Non-fatal: use the hybrid-ranked order.
+		fmt.Fprintf(os.Stderr, "warn: rerank: %v\n", err)
+	}
+
+	// Use top 5 for answer synthesis.
+	if len(memories) > 5 {
+		memories = memories[:5]
+	}
+
+	// Step 4: LLM-synthesised answer.
 	return s.ai.Answer(ctx, question, memories)
 }
 

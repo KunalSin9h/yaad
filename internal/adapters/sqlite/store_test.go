@@ -255,6 +255,104 @@ func TestStore_PendingReminders(t *testing.T) {
 	assert.Equal(t, "01DUE001", results[0].ID)
 }
 
+// --- FindHybrid ---
+
+func TestStore_FindHybrid_KeywordWins(t *testing.T) {
+	db := newTestDB(t)
+	ctx := context.Background()
+
+	// "nginx" memory — exact keyword match, irrelevant embedding.
+	nginx := sampleMemory("01NGINX1")
+	nginx.Content = "configure nginx reverse proxy for the api"
+	nginx.ForLabel = "infra work"
+	nginx.Embedding = []float32{0.0, 0.0, 1.0} // orthogonal to query
+
+	// "golang" memory — no keyword match, close embedding.
+	golang := sampleMemory("01GOLN01")
+	golang.Content = "write a golang http handler"
+	golang.ForLabel = "backend work"
+	golang.Embedding = []float32{1.0, 0.0, 0.0} // very close to query
+
+	require.NoError(t, db.Store.Save(ctx, nginx))
+	require.NoError(t, db.Store.Save(ctx, golang))
+
+	// Query is keyword "nginx" but embedding matches "golang".
+	// Hybrid RRF should surface nginx due to BM25 boost.
+	results, err := db.Store.FindHybrid(ctx, "nginx", []float32{0.99, 0.0, 0.01}, 2)
+	require.NoError(t, err)
+	require.NotEmpty(t, results)
+	assert.Equal(t, "01NGINX1", results[0].ID, "BM25 exact match should rank first in hybrid")
+}
+
+func TestStore_FindHybrid_FallsBackOnEmptyQuery(t *testing.T) {
+	db := newTestDB(t)
+	ctx := context.Background()
+
+	m := sampleMemory("01HYB001")
+	m.Embedding = []float32{1.0, 0.0}
+	require.NoError(t, db.Store.Save(ctx, m))
+
+	// Empty or special-char query should not crash; falls back gracefully.
+	results, err := db.Store.FindHybrid(ctx, "", []float32{1.0, 0.0}, 5)
+	require.NoError(t, err)
+	_ = results // may be empty or have the vector result
+}
+
+// --- Entity graph ---
+
+func TestStore_SaveAndFindByEntities(t *testing.T) {
+	db := newTestDB(t)
+	ctx := context.Background()
+
+	m1 := sampleMemory("01ENT001")
+	m1.Content = "debug payments-api with alice"
+	require.NoError(t, db.Store.Save(ctx, m1))
+
+	m2 := sampleMemory("01ENT002")
+	m2.Content = "deploy nginx for bob"
+	require.NoError(t, db.Store.Save(ctx, m2))
+
+	// Link entities.
+	require.NoError(t, db.Store.SaveEntities(ctx, m1.ID, []domain.Entity{
+		{Name: "alice", Type: domain.EntityTypePerson},
+		{Name: "payments-api", Type: domain.EntityTypeProject},
+	}))
+	require.NoError(t, db.Store.SaveEntities(ctx, m2.ID, []domain.Entity{
+		{Name: "nginx", Type: domain.EntityTypeTool},
+		{Name: "bob", Type: domain.EntityTypePerson},
+	}))
+
+	// Search by entity name.
+	results, err := db.Store.FindByEntities(ctx, []string{"alice"}, 10)
+	require.NoError(t, err)
+	require.Len(t, results, 1)
+	assert.Equal(t, m1.ID, results[0].ID)
+
+	// Search for a tool entity.
+	results, err = db.Store.FindByEntities(ctx, []string{"nginx"}, 10)
+	require.NoError(t, err)
+	require.Len(t, results, 1)
+	assert.Equal(t, m2.ID, results[0].ID)
+}
+
+func TestStore_SaveEntities_Idempotent(t *testing.T) {
+	db := newTestDB(t)
+	ctx := context.Background()
+
+	m := sampleMemory("01IDEM01")
+	require.NoError(t, db.Store.Save(ctx, m))
+
+	entities := []domain.Entity{{Name: "docker", Type: domain.EntityTypeTool}}
+
+	// Saving the same entities twice should not error.
+	require.NoError(t, db.Store.SaveEntities(ctx, m.ID, entities))
+	require.NoError(t, db.Store.SaveEntities(ctx, m.ID, entities))
+
+	results, err := db.Store.FindByEntities(ctx, []string{"docker"}, 10)
+	require.NoError(t, err)
+	assert.Len(t, results, 1)
+}
+
 func TestStore_MarkReminded(t *testing.T) {
 	db := newTestDB(t)
 	ctx := context.Background()

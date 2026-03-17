@@ -22,6 +22,11 @@ ollama.embed_model   = nomic-embed-text
 # Chat model — llama3.2:3b, mistral, gemma2:2b, phi3
 ollama.chat_model    = llama3.2:3b
 
+# Rerank model — cross-encoder for hybrid retrieval reranking (optional)
+# Requires: ollama pull dengcao/Qwen3-Reranker-0.6B
+# Leave unset to skip reranking.
+ollama.rerank_model  = dengcao/Qwen3-Reranker-0.6B
+
 # Reminder daemon poll interval
 reminder.poll_interval = 30s
 
@@ -40,6 +45,7 @@ notifier = cli
 | `ollama.url` | `http://localhost:11434` | Ollama server URL |
 | `ollama.embed_model` | `nomic-embed-text` | Model for generating embeddings |
 | `ollama.chat_model` | `llama3.2:3b` | Model for query answering and type detection |
+| `ollama.rerank_model` | _(unset)_ | Cross-encoder rerank model; empty = skip reranking. Requires `ollama pull dengcao/Qwen3-Reranker-0.6B` |
 | `reminder.poll_interval` | `30s` | How often the daemon polls for due reminders |
 | `notifier` | `cli` | Notifier adapter(s), comma-separated |
 
@@ -56,6 +62,7 @@ CLI flags override the rc file for a single invocation:
 ```bash
 yaad --chat-model mistral ask "what was that command?"
 yaad --ollama-url http://192.168.1.5:11434 add "remote ollama note"
+yaad --rerank-model dengcao/Qwen3-Reranker-0.6B ask "who did I meet last week?"
 yaad --notifier cli,notify-send check
 ```
 

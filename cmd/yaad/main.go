@@ -82,8 +82,9 @@ Examples:
 			ollamaURL := resolve(cmd, "ollama-url", rc, "ollama.url", "http://localhost:11434")
 			embedModel := resolve(cmd, "embed-model", rc, "ollama.embed_model", "nomic-embed-text")
 			chatModel := resolve(cmd, "chat-model", rc, "ollama.chat_model", "llama3.2:3b")
+			rerankModel := resolve(cmd, "rerank-model", rc, "ollama.rerank_model", "")
 
-			aiClient := ollama.New(ollamaURL, embedModel, chatModel)
+			aiClient := ollama.New(ollamaURL, embedModel, chatModel).WithRerankModel(rerankModel)
 
 			notif := buildNotifier(resolve(cmd, "notifier", rc, "notifier", "cli"))
 
@@ -97,6 +98,7 @@ Examples:
 	root.PersistentFlags().String("ollama-url", "", "Ollama server URL (overrides rc file)")
 	root.PersistentFlags().String("chat-model", "", "Chat model to use (overrides rc file)")
 	root.PersistentFlags().String("embed-model", "", "Embedding model to use (overrides rc file)")
+	root.PersistentFlags().String("rerank-model", "", "Rerank model for cross-encoder reranking, e.g. dengcao/Qwen3-Reranker-0.6B (overrides rc file)")
 	root.PersistentFlags().String("notifier", "", "Notifier adapter: cli|notify-send (overrides rc file)")
 
 	root.AddCommand(

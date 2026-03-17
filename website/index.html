@@ -19,8 +19,8 @@
       --border:  #2e2b26;
       --border2: #3d3a33;
       --text:    #f0ede6;
-      --muted:   #888580;
-      --dim:     #52504a;
+      --muted:   #9e9a93;
+      --dim:     #6e6b63;
 
       --green:   #4ade80;
       --amber:   #fbbf24;
@@ -101,9 +101,7 @@
       top: 0; left: 50%; transform: translateX(-50%);
       width: 900px; height: 500px;
       background:
-        radial-gradient(ellipse 60% 50% at 40% 40%, rgba(74,222,128,.07) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 40% at 65% 50%, rgba(96,165,250,.05) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 60% at 50% 10%, rgba(251,191,36,.04) 0%, transparent 70%);
+        radial-gradient(ellipse 60% 55% at 50% 40%, rgba(74,222,128,.08) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero-scanlines {
@@ -145,7 +143,7 @@
       font-weight: 800;
       letter-spacing: -.04em;
       line-height: .88;
-      background: linear-gradient(120deg, #9cffb0 0%, #7dd3fc 40%, #fbbf24 70%, #fb7185 100%);
+      background: linear-gradient(120deg, #4ade80 0%, #22d3ee 100%);
       -webkit-text-fill-color: transparent;
       background-clip: text;
       filter: drop-shadow(0 0 60px rgba(74,222,128,.12));
@@ -612,8 +610,8 @@
 
   <h1>Your terminal,<br /><span class="hi">finally has memory</span>.</h1>
   <p class="hero-sub">
-    Save commands, notes, URLs, facts, and reminders right in the terminal.
-    Recall anything later with natural language. Fully local with Ollama.
+    You've already solved this problem. You just can't remember where.
+    Save anything from your terminal and recall it later in plain English — fully local with Ollama.
   </p>
   <div class="hero-actions">
     <a href="#install" class="btn-primary">Get started →</a>
@@ -634,15 +632,16 @@
       </div>
       <div class="terminal-body">
         <div class="t-out"><span style="color:var(--dim)">── save once ────────────────────────</span></div>
-        <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"claude session for db migration: 3fa2c891-7b4e....."</span></div>
+        <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"claude --resume 3fa2c891-7b4e-4d1a-9f3c-2e8b5a6d0c19"</span> <span class="t-flag">--for</span> <span class="t-str">"yaad CLI hybrid retrieval refactor"</span></div>
+        <div class="t-out">  saved &nbsp;[command]</div>
+        <span class="t-blank"></span>
+        <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"payments-api prod: rds.internal:5432/payments"</span></div>
         <div class="t-out">  saved &nbsp;[fact]</div>
         <span class="t-blank"></span>
-        <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"prod needs VPN + bastion-01.internal"</span></div>
-        <div class="t-out">  saved &nbsp;[note]</div>
-        <span class="t-blank"></span>
-        <div class="t-out"><span style="color:var(--dim)">── recall anytime ───────────────────</span></div>
-        <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"claude session for db migration?"</span></div>
-        <div class="t-ans">  3fa2c891-7b4e-4d1a-9f3c-2e8b5a6d0c19</div>
+        <div class="t-out"><span style="color:var(--dim)">── weeks later, ask indirectly ──────</span></div>
+        <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"where was I with the yaad work?"</span></div>
+        <div class="t-ans">  claude --resume 3fa2c891-7b4e-4d1a-9f3c-2e8b5a6d0c19</div>
+        <div class="t-out" style="font-size:.8em;opacity:.6">  ↳ yaad CLI hybrid retrieval refactor</div>
       </div>
     </div>
 
@@ -680,34 +679,38 @@
 <div class="marquee-wrap">
   <div class="marquee-track">
     <!-- first copy -->
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"where was I with the auth refactor?"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"claude --resume 3fa2c891..."</span> <span class="flag">--for</span> <span class="str">"payments-api session"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"everything I know about payments-api"</span></span>
+    <span class="marquee-item sep">·</span>
     <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"deploy prod at 3pm"</span> <span class="flag">--remind</span> <span class="str">"in 2h"</span></span>
     <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"what's the staging db port?"</span></span>
-    <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"https://docs.example.com/api"</span> <span class="flag">--tag</span> <span class="str">reference</span></span>
-    <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad list</span> <span class="flag">--remind</span></span>
-    <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"any pending reminders for today?"</span></span>
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"how do I get into the prod database?"</span></span>
     <span class="marquee-item sep">·</span>
     <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"submit PR for review"</span> <span class="flag">--remind</span> <span class="str">"tomorrow 9am"</span></span>
     <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad get</span> <span class="str">01JTXK4A3B</span></span>
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"that nginx config I saved last week"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad list</span> <span class="flag">--remind</span></span>
     <span class="marquee-item sep">·</span>
     <!-- second copy (for seamless loop) -->
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"where was I with the auth refactor?"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"claude --resume 3fa2c891..."</span> <span class="flag">--for</span> <span class="str">"payments-api session"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"everything I know about payments-api"</span></span>
+    <span class="marquee-item sep">·</span>
     <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"deploy prod at 3pm"</span> <span class="flag">--remind</span> <span class="str">"in 2h"</span></span>
     <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"what's the staging db port?"</span></span>
-    <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"https://docs.example.com/api"</span> <span class="flag">--tag</span> <span class="str">reference</span></span>
-    <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad list</span> <span class="flag">--remind</span></span>
-    <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"any pending reminders for today?"</span></span>
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"how do I get into the prod database?"</span></span>
     <span class="marquee-item sep">·</span>
     <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"submit PR for review"</span> <span class="flag">--remind</span> <span class="str">"tomorrow 9am"</span></span>
     <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad get</span> <span class="str">01JTXK4A3B</span></span>
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"that nginx config I saved last week"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad list</span> <span class="flag">--remind</span></span>
     <span class="marquee-item sep">·</span>
   </div>
 </div>
@@ -719,10 +722,33 @@
       <svg viewBox="0 0 24 24"><path d="M12 4l2.2 4.4L19 9l-3.5 3.3.9 4.7-4.4-2.4-4.4 2.4.9-4.7L5 9l4.8-.6z"></path></svg>
       features
     </span>
-    <h2>Everything you need,<br />nothing you don't.</h2>
-    <p class="section-lead">Query-first memory that stays local and fits how developers actually work.</p>
+    <h2>The retrieval is serious.<br />The interface is two words.</h2>
+    <p class="section-lead">Local embeddings, BM25, RRF fusion, cross-encoder reranking — all behind <code>yaad ask</code>.</p>
 
     <div class="features-grid">
+      <div class="feature-card c-purple">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 10V8a7 7 0 0114 0v2"></path>
+            <rect x="4" y="10" width="16" height="10" rx="2"></rect>
+            <circle cx="12" cy="15" r="2"></circle>
+          </svg>
+        </div>
+        <span class="sr-only">privacy</span>
+        <h3>Fully local &amp; private</h3>
+        <p>All AI runs via Ollama on your machine. No cloud, no accounts, no data leaving your laptop.</p>
+      </div>
+      <div class="feature-card c-amber">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="7"></circle>
+            <path d="M12 8v4l3 2"></path>
+          </svg>
+        </div>
+        <span class="sr-only">reminders</span>
+        <h3>Smart reminders</h3>
+        <p>Parse <code>"in 30 minutes"</code>, <code>"tomorrow 9am"</code>, or <code>"Friday 3pm"</code> into real deadlines. Fires inline in your terminal or as a desktop notification.</p>
+      </div>
       <div class="feature-card c-green">
         <div class="feature-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
@@ -738,39 +764,42 @@
       <div class="feature-card c-amber">
         <div class="feature-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
-            <path d="M5 10V8a7 7 0 0114 0v2"></path>
-            <rect x="4" y="10" width="16" height="10" rx="2"></rect>
-            <circle cx="12" cy="15" r="2"></circle>
+            <path d="M4 12h10"></path>
+            <path d="M14 8l4 4-4 4"></path>
+            <path d="M4 6h5"></path>
+            <path d="M4 18h5"></path>
           </svg>
         </div>
-        <span class="sr-only">privacy</span>
-        <h3>Fully local &amp; private</h3>
-        <p>All AI runs via Ollama on your machine. No cloud, no accounts, no data leaving your laptop.</p>
+        <span class="sr-only">hybrid retrieval</span>
+        <h3>Hybrid retrieval</h3>
+        <p>BM25 keyword search + semantic vector search merged via Reciprocal Rank Fusion. Catches exact names <em>and</em> fuzzy semantics in one pass.</p>
       </div>
-      <div class="feature-card c-rose">
+      <div class="feature-card c-cyan">
         <div class="feature-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="7"></circle>
-            <path d="M12 8v4l3 2"></path>
+            <path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z"></path>
           </svg>
         </div>
-        <span class="sr-only">reminders</span>
-        <h3>Smart reminders</h3>
-        <p>Parse <code>"in 30 minutes"</code>, <code>"tomorrow 9am"</code>, or <code>"Friday 3pm"</code> into real deadlines.</p>
+        <span class="sr-only">hyde</span>
+        <h3>HyDE query expansion</h3>
+        <p>Embeds a <em>hypothetical answer</em> instead of your raw question — placing the query in the same space as stored memories for 10–30% better semantic recall.</p>
       </div>
       <div class="feature-card c-blue">
         <div class="feature-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
-            <path d="M4 7h7v10H4z"></path>
-            <path d="M13 5h7v14h-7z"></path>
-            <path d="M7.5 10h0"></path>
+            <circle cx="8" cy="12" r="3"></circle>
+            <circle cx="18" cy="6" r="3"></circle>
+            <circle cx="18" cy="18" r="3"></circle>
+            <path d="M11 12h4"></path>
+            <path d="M15 7.5l-4 3"></path>
+            <path d="M15 16.5l-4-3"></path>
           </svg>
         </div>
-        <span class="sr-only">context</span>
-        <h3>Rich metadata</h3>
-        <p>Every memory captures context, cwd, hostname, and timestamp. AI auto-detects type and tags.</p>
+        <span class="sr-only">entity graph</span>
+        <h3>Entity knowledge graph</h3>
+        <p>AI extracts people, projects, tools, and concepts from every memory. Recall everything related to a person or project — independent of exact wording.</p>
       </div>
-      <div class="feature-card c-purple">
+      <div class="feature-card c-rose">
         <div class="feature-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24">
             <path d="M6 12a6 6 0 1110 4"></path>
@@ -781,18 +810,6 @@
         <span class="sr-only">resilience</span>
         <h3>Offline-safe</h3>
         <p>Memories save even when Ollama is down. AI enrichment degrades gracefully, never blocking saves.</p>
-      </div>
-      <div class="feature-card c-cyan">
-        <div class="feature-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M4 6h6v6H4z"></path>
-            <path d="M14 6h6v6h-6z"></path>
-            <path d="M9 12h6v6H9z"></path>
-          </svg>
-        </div>
-        <span class="sr-only">architecture</span>
-        <h3>Ports &amp; Adapters</h3>
-        <p>Swap storage, AI provider, or notifier by implementing a single interface.</p>
       </div>
     </div>
   </div>
@@ -805,8 +822,8 @@
       <svg viewBox="0 0 24 24"><path d="M12 4v10"></path><path d="M8 10l4 4 4-4"></path><rect x="4" y="16" width="16" height="4" rx="1"></rect></svg>
       installation
     </span>
-    <h2>Up and running in minutes.</h2>
-    <p class="section-lead">Requires Ollama running locally.</p>
+    <h2>Four commands and you're done.</h2>
+    <p class="section-lead">Requires <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> running locally. Everything else is a single binary.</p>
 
     <div class="install-steps">
       <div class="step">
@@ -817,7 +834,9 @@
           <pre><span class="c"># embeddings model</span>
 <span class="k">ollama pull</span> nomic-embed-text
 <span class="c"># chat / reasoning model (swap for any compatible one)</span>
-<span class="k">ollama pull</span> llama3.2:3b</pre>
+<span class="k">ollama pull</span> llama3.2:3b
+<span class="c"># optional: cross-encoder reranker for higher recall quality</span>
+<span class="k">ollama pull</span> dengcao/Qwen3-Reranker-0.6B</pre>
         </div>
       </div>
       <div class="step">
@@ -831,6 +850,7 @@
         <div class="step-num">3</div>
         <div class="step-body">
           <h4>Initialise config</h4>
+          <p>Creates <code>~/.yaadrc</code> with sensible defaults. Skip this and yaad will use built-in defaults.</p>
           <pre>yaad config init</pre>
         </div>
       </div>
@@ -856,8 +876,8 @@
       <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"></path><path d="M7 9l3 3-3 3"></path><path d="M12 15h5"></path></svg>
       usage
     </span>
-    <h2>A command for every moment.</h2>
-    <p class="section-lead">Five memory types, auto-detected by AI: <code>command</code> · <code>note</code> · <code>url</code> · <code>fact</code> · <code>reminder</code></p>
+    <h2>Six commands.<br />That's the whole tool.</h2>
+    <p class="section-lead">Types auto-detected by AI: <code>command</code> · <code>note</code> · <code>url</code> · <code>fact</code> · <code>reminder</code></p>
 
     <div class="commands-grid">
       <div class="cmd-card">
@@ -870,10 +890,11 @@ yaad add <span class="s">"ssh -i ~/.ssh/id_rsa user@prod"</span> <span class="k"
       </div>
       <div class="cmd-card">
         <div class="cmd-name">yaad ask</div>
-        <p>Query in plain English. LLM reasons over semantic search results to give a direct answer.</p>
-        <pre style="margin-top:.75rem;font-size:.75rem">yaad ask <span class="s">"what is the staging db port?"</span>
-yaad ask <span class="s">"do I have anything due today?"</span>
-yaad ask <span class="s">"how do I log into prod?"</span></pre>
+        <p>Query in plain English. HyDE expansion → hybrid BM25/vector retrieval → optional reranking → LLM synthesises a direct answer.</p>
+        <pre style="margin-top:.75rem;font-size:.75rem">yaad ask <span class="s">"where was I with the payments-api work?"</span>
+yaad ask <span class="s">"how do I get into prod?"</span>
+yaad ask <span class="s">"everything I saved about Alice"</span>
+yaad ask <span class="s">"do I have anything due today?"</span></pre>
       </div>
       <div class="cmd-card">
         <div class="cmd-name">yaad list</div>
@@ -900,6 +921,7 @@ yaad clean                  <span class="c"># delete all</span></pre>
         <p>Manage <code>~/.yaadrc</code>. Override Ollama URL, models, notifier, and reminder poll interval.</p>
         <pre style="margin-top:.75rem;font-size:.75rem">yaad config init
 yaad config set ollama.chat_model llama3.2:3b
+yaad config set ollama.rerank_model dengcao/Qwen3-Reranker-0.6B
 yaad config list</pre>
       </div>
     </div>
@@ -914,8 +936,8 @@ yaad config list</pre>
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"></circle><path d="M12 8v4l3 2"></path></svg>
       reminders
     </span>
-    <h2>Never miss a deadline.</h2>
-    <p class="section-lead">Two ways to surface reminders — pick what fits your workflow.</p>
+    <h2>Reminders that find you,<br />not the other way around.</h2>
+    <p class="section-lead">Two lines in your shell config. No app to check, no tab to keep open.</p>
 
     <div class="reminder-options">
       <div class="reminder-card">
@@ -954,7 +976,7 @@ systemctl --user status yaad</pre>
       <svg viewBox="0 0 24 24"><path d="M8 6h8"></path><path d="M6 8v8"></path><path d="M18 8v8"></path><path d="M8 18h8"></path></svg>
       open source
     </span>
-    <h2>Start remembering<br />everything.</h2>
+    <h2>Your past self is trying<br />to tell you something.</h2>
     <p>One command. All local. MIT licensed.</p>
     <div class="hero-actions" style="justify-content:center">
       <a href="#install" class="btn-primary">Install yaad →</a>
