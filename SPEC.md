@@ -1,8 +1,8 @@
-# rememberit — Product Specification
+# lore — Product Specification
 
 ## Overview
 
-`rememberit` is a terminal-native, AI-powered memory and reminder CLI. It lets you save any piece of information — commands, notes, URLs, facts, reminders — with rich metadata, then retrieve it later through natural language queries. The AI layer runs entirely locally via Ollama, keeping all data private and offline-capable.
+`lore` is a terminal-native, AI-powered memory and reminder CLI. It lets you save any piece of information — commands, notes, URLs, facts, reminders — with rich metadata, then retrieve it later through natural language queries. The AI layer runs entirely locally via Ollama, keeping all data private and offline-capable.
 
 It is **not** a calendar replacement. It is a queryable, intelligent scratchpad that lives in your terminal.
 
@@ -46,10 +46,10 @@ Type is auto-detected by the AI on `add`. User can override with `--type`.
 
 ## CLI Interface
 
-### `rememberit add`
+### `lore add`
 
 ```bash
-rememberit add "<content>" [flags]
+lore add "<content>" [flags]
 
 Flags:
   --for, -f   string   Human context / purpose label
@@ -60,35 +60,35 @@ Flags:
 
 Examples:
 ```bash
-rememberit add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
+lore add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
   --for "rememberit CLI build session"
 
-rememberit add "book conference ticket" \
+lore add "book conference ticket" \
   --remind "in 30 minutes"
 
-rememberit add "postgres password is hunter2" \
+lore add "postgres password is hunter2" \
   --for "staging env" --tag secrets
 ```
 
-### `rememberit ask`
+### `lore ask`
 
 Natural language query. AI finds relevant memories and synthesizes an answer.
 
 ```bash
-rememberit ask "<question>"
+lore ask "<question>"
 ```
 
 Examples:
 ```bash
-rememberit ask "which claude session was I building rememberit in?"
-rememberit ask "what do I need to do tonight?"
-rememberit ask "what was that postgres port number?"
+lore ask "which claude session was I building rememberit in?"
+lore ask "what do I need to do tonight?"
+lore ask "what was that postgres port number?"
 ```
 
-### `rememberit list`
+### `lore list`
 
 ```bash
-rememberit list [flags]
+lore list [flags]
 
 Flags:
   --type    string   Filter by memory type
@@ -97,53 +97,53 @@ Flags:
   --remind         Show only pending reminders
 ```
 
-### `rememberit get`
+### `lore get`
 
 Retrieve a single memory by ID or fuzzy content match.
 
 ```bash
-rememberit get <id>
-rememberit get --like "claude resume"
+lore get <id>
+lore get --like "claude resume"
 ```
 
-### `rememberit delete`
+### `lore delete`
 
 ```bash
-rememberit delete <id>
+lore delete <id>
 ```
 
-### `rememberit daemon`
+### `lore daemon`
 
 Background process that fires reminder notifications.
 
 ```bash
-rememberit daemon start    # start in background
-rememberit daemon stop
-rememberit daemon status
-rememberit daemon install  # install as systemd user service
+lore daemon start    # start in background
+lore daemon stop
+lore daemon status
+lore daemon install  # install as systemd user service
 ```
 
-### `rememberit check`
+### `lore check`
 
 Designed to be called from shell `PROMPT_COMMAND`. Silently checks for due reminders and prints inline if any are found. Zero-latency alternative to daemon.
 
 ```bash
-rememberit check           # prints nothing if no reminders due
+lore check           # prints nothing if no reminders due
 ```
 
 Shell integration (add to `.bashrc` / `.zshrc`):
 ```bash
-PROMPT_COMMAND="rememberit check; $PROMPT_COMMAND"
+PROMPT_COMMAND="lore check; $PROMPT_COMMAND"
 ```
 
-### `rememberit config`
+### `lore config`
 
 ```bash
-rememberit config set ollama.url http://localhost:11434
-rememberit config set ollama.embed_model nomic-embed-text
-rememberit config set ollama.chat_model llama3.2:3b
-rememberit config get ollama.url
-rememberit config list
+lore config set ollama.url http://localhost:11434
+lore config set ollama.embed_model nomic-embed-text
+lore config set ollama.chat_model llama3.2:3b
+lore config get ollama.url
+lore config list
 ```
 
 ---
@@ -310,8 +310,8 @@ CREATE INDEX idx_memories_created_at ON memories(created_at DESC);
 
 ## Configuration
 
-Stored at `~/.config/rememberit/config.db` (same SQLite file).
-Data stored at `~/.local/share/rememberit/memories.db`.
+Stored at `~/.config/lore/config.db` (same SQLite file).
+Data stored at `~/.local/share/lore/memories.db`.
 
 | Key | Default |
 |---|---|

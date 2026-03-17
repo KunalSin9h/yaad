@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/kunalsin9h/rememberit/internal/ports"
+	"github.com/kunalsin9h/lore/internal/ports"
 )
 
 // ReminderService checks for due reminders and fires notifications.

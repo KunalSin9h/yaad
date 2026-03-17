@@ -3,7 +3,7 @@ package sqlite
 import (
 	"database/sql"
 
-	"github.com/kunalsin9h/rememberit/internal/ports"
+	"github.com/kunalsin9h/lore/internal/ports"
 )
 
 // Compile-time interface check.

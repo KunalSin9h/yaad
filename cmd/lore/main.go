@@ -11,13 +11,14 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/kunalsin9h/rememberit/internal/adapters/notifier"
-	"github.com/kunalsin9h/rememberit/internal/adapters/ollama"
-	sqliteadapter "github.com/kunalsin9h/rememberit/internal/adapters/sqlite"
-	"github.com/kunalsin9h/rememberit/internal/adapters/timeparser"
-	"github.com/kunalsin9h/rememberit/internal/app"
-	"github.com/kunalsin9h/rememberit/internal/domain"
-	"github.com/kunalsin9h/rememberit/internal/ports"
+	"github.com/kunalsin9h/lore/internal/adapters/notifier"
+	"github.com/kunalsin9h/lore/internal/adapters/ollama"
+	"github.com/kunalsin9h/lore/internal/adapters/rcfile"
+	sqliteadapter "github.com/kunalsin9h/lore/internal/adapters/sqlite"
+	"github.com/kunalsin9h/lore/internal/adapters/timeparser"
+	"github.com/kunalsin9h/lore/internal/app"
+	"github.com/kunalsin9h/lore/internal/domain"
+	"github.com/kunalsin9h/lore/internal/ports"
 	"github.com/spf13/cobra"
 )
 
@@ -29,64 +30,109 @@ func main() {
 }
 
 func run() error {
+	// Determine paths.
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	rcPath := filepath.Join(home, ".lorerc")
 	dataDir, err := dataDirectory()
 	if err != nil {
 		return err
 	}
 
-	db, err := sqliteadapter.Open(filepath.Join(dataDir, "memories.db"))
-	if err != nil {
-		return fmt.Errorf("open database: %w", err)
-	}
-	defer db.Close()
+	// Load rc file (missing file is fine — all keys fall back to defaults).
+	rc := rcfile.New(rcPath)
 
-	cfg := &configHelper{cfg: db.Config}
-
-	aiClient := ollama.New(
-		cfg.get("ollama.url", "http://localhost:11434"),
-		cfg.get("ollama.embed_model", "nomic-embed-text"),
-		cfg.get("ollama.chat_model", "llama3.2:3b"),
+	// Services are built inside PersistentPreRunE, after flags are parsed,
+	// so that CLI flags can override rc file values.
+	// Commands access them via closure over these variables.
+	var (
+		memorySvc   *app.MemoryService
+		reminderSvc *app.ReminderService
+		db          *sqliteadapter.DB
 	)
 
-	var notif ports.NotifierPort
-	if notifier.IsAvailable() {
-		notif = notifier.NewNotifySend()
-	} else {
-		notif = notifier.NewStdout()
-	}
-
-	memorySvc := app.NewMemoryService(db.Store, aiClient, timeparser.New())
-	reminderSvc := app.NewReminderService(db.Store, notif)
-
 	root := &cobra.Command{
-		Use:   "rememberit",
+		Use:   "lore",
 		Short: "AI-native terminal memory and reminder system",
-		Long: `rememberit — save anything from your terminal, recall it with natural language.
+		Long: `lore — save anything from your terminal, recall it with natural language.
 
 Examples:
-  rememberit add "claude --resume abc123" --for "rememberit build session"
-  rememberit add "book conference ticket" --remind "in 30 minutes"
-  rememberit ask "which claude session was I building rememberit in?"
-  rememberit list`,
+  lore add "claude --resume abc123" --for "lore build session"
+  lore add "book conference ticket" --remind "in 30 minutes"
+  lore ask "which claude session was I building lore in?"
+  lore list`,
+
+		// Build all services here — flags have been parsed, rc file is loaded.
+		// Config priority: built-in defaults < ~/.lorerc < CLI flags.
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			// Skip for config and help commands — they don't need AI or DB.
+			if cmd.Name() == "init" || cmd.Name() == "help" || cmd.Name() == "completion" {
+				return nil
+			}
+
+			var err error
+			db, err = sqliteadapter.Open(filepath.Join(dataDir, "memories.db"))
+			if err != nil {
+				return fmt.Errorf("open database: %w", err)
+			}
+
+			// Resolve: flag > rc file > built-in default.
+			ollamaURL := resolve(cmd, "ollama-url", rc, "ollama.url", "http://localhost:11434")
+			embedModel := resolve(cmd, "embed-model", rc, "ollama.embed_model", "nomic-embed-text")
+			chatModel := resolve(cmd, "chat-model", rc, "ollama.chat_model", "llama3.2:3b")
+
+			aiClient := ollama.New(ollamaURL, embedModel, chatModel)
+
+			var notif ports.NotifierPort
+			if notifier.IsAvailable() {
+				notif = notifier.NewNotifySend()
+			} else {
+				notif = notifier.NewStdout()
+			}
+
+			memorySvc = app.NewMemoryService(db.Store, aiClient, timeparser.New())
+			reminderSvc = app.NewReminderService(db.Store, notif)
+			return nil
+		},
 	}
 
+	// Root persistent flags — override rc file for any sub-command.
+	root.PersistentFlags().String("ollama-url", "", "Ollama server URL (overrides rc file)")
+	root.PersistentFlags().String("chat-model", "", "Chat model to use (overrides rc file)")
+	root.PersistentFlags().String("embed-model", "", "Embedding model to use (overrides rc file)")
+
 	root.AddCommand(
-		addCmd(memorySvc),
-		askCmd(memorySvc),
-		listCmd(memorySvc),
-		getCmd(memorySvc),
-		deleteCmd(memorySvc),
-		checkCmd(reminderSvc),
-		daemonCmd(reminderSvc, cfg),
-		configCmd(db.Config),
+		addCmd(&memorySvc, &db),
+		askCmd(&memorySvc),
+		listCmd(&memorySvc),
+		getCmd(&memorySvc),
+		deleteCmd(&memorySvc),
+		checkCmd(&reminderSvc),
+		daemonCmd(&reminderSvc, rc),
+		configCmd(rc, rcPath),
 	)
 
 	return root.Execute()
 }
 
+// resolve returns the first non-empty value in: CLI flag → rc file → default.
+func resolve(cmd *cobra.Command, flagName string, rc ports.ConfigPort, rcKey, defaultVal string) string {
+	// CLI flag takes highest priority (only if explicitly set by the user).
+	if f := cmd.Root().PersistentFlags().Lookup(flagName); f != nil && f.Changed {
+		return f.Value.String()
+	}
+	// rc file next.
+	if v, _ := rc.Get(rcKey); v != "" {
+		return v
+	}
+	return defaultVal
+}
+
 // --- add ---
 
-func addCmd(svc *app.MemoryService) *cobra.Command {
+func addCmd(svc **app.MemoryService, db **sqliteadapter.DB) *cobra.Command {
 	var forLabel, remind, typeHint string
 	var tags []string
 
@@ -95,7 +141,8 @@ func addCmd(svc *app.MemoryService) *cobra.Command {
 		Short: "Save a new memory",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			m, err := svc.Add(context.Background(), app.AddRequest{
+			defer (*db).Close()
+			m, err := (*svc).Add(context.Background(), app.AddRequest{
 				Content:    args[0],
 				ForLabel:   forLabel,
 				RemindExpr: remind,
@@ -105,7 +152,6 @@ func addCmd(svc *app.MemoryService) *cobra.Command {
 			if err != nil {
 				return err
 			}
-
 			fmt.Printf("saved    %s\n", shortID(m.ID))
 			fmt.Printf("type     %s\n", m.Type)
 			if len(m.Tags) > 0 {
@@ -127,13 +173,13 @@ func addCmd(svc *app.MemoryService) *cobra.Command {
 
 // --- ask ---
 
-func askCmd(svc *app.MemoryService) *cobra.Command {
+func askCmd(svc **app.MemoryService) *cobra.Command {
 	return &cobra.Command{
 		Use:   "ask <question>",
 		Short: "Query your memories with natural language",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			answer, err := svc.Ask(context.Background(), strings.Join(args, " "))
+			answer, err := (*svc).Ask(context.Background(), strings.Join(args, " "))
 			if err != nil {
 				return err
 			}
@@ -145,7 +191,7 @@ func askCmd(svc *app.MemoryService) *cobra.Command {
 
 // --- list ---
 
-func listCmd(svc *app.MemoryService) *cobra.Command {
+func listCmd(svc **app.MemoryService) *cobra.Command {
 	var typeFlag, tagFlag string
 	var limit int
 	var remindOnly bool
@@ -154,7 +200,7 @@ func listCmd(svc *app.MemoryService) *cobra.Command {
 		Use:   "list",
 		Short: "List saved memories",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			memories, err := svc.List(context.Background(), domain.ListFilter{
+			memories, err := (*svc).List(context.Background(), domain.ListFilter{
 				Type:          domain.MemoryType(typeFlag),
 				Tag:           tagFlag,
 				Limit:         limit,
@@ -181,13 +227,13 @@ func listCmd(svc *app.MemoryService) *cobra.Command {
 
 // --- get ---
 
-func getCmd(svc *app.MemoryService) *cobra.Command {
+func getCmd(svc **app.MemoryService) *cobra.Command {
 	return &cobra.Command{
 		Use:   "get <id>",
 		Short: "Show full details of a memory",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			m, err := svc.GetByID(context.Background(), args[0])
+			m, err := (*svc).GetByID(context.Background(), args[0])
 			if err != nil {
 				return err
 			}
@@ -199,7 +245,7 @@ func getCmd(svc *app.MemoryService) *cobra.Command {
 
 // --- delete ---
 
-func deleteCmd(svc *app.MemoryService) *cobra.Command {
+func deleteCmd(svc **app.MemoryService) *cobra.Command {
 	var force bool
 
 	cmd := &cobra.Command{
@@ -216,7 +262,7 @@ func deleteCmd(svc *app.MemoryService) *cobra.Command {
 					return nil
 				}
 			}
-			if err := svc.Delete(context.Background(), args[0]); err != nil {
+			if err := (*svc).Delete(context.Background(), args[0]); err != nil {
 				return err
 			}
 			fmt.Printf("deleted %s\n", shortID(args[0]))
@@ -228,25 +274,28 @@ func deleteCmd(svc *app.MemoryService) *cobra.Command {
 	return cmd
 }
 
-// --- check (designed for PROMPT_COMMAND) ---
+// --- check ---
 
-func checkCmd(svc *app.ReminderService) *cobra.Command {
+func checkCmd(svc **app.ReminderService) *cobra.Command {
 	return &cobra.Command{
 		Use:   "check",
 		Short: "Check for due reminders (silent unless reminders are firing)",
 		Long: `Designed to run on every shell prompt via PROMPT_COMMAND:
 
   Add to ~/.bashrc or ~/.zshrc:
-    export PROMPT_COMMAND="rememberit check; $PROMPT_COMMAND"`,
+    export PROMPT_COMMAND="lore check; $PROMPT_COMMAND"
+
+  For zsh, add to ~/.zshrc:
+    precmd() { lore check }`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return svc.CheckAndFire(context.Background())
+			return (*svc).CheckAndFire(context.Background())
 		},
 	}
 }
 
 // --- daemon ---
 
-func daemonCmd(svc *app.ReminderService, cfg *configHelper) *cobra.Command {
+func daemonCmd(svc **app.ReminderService, rc ports.ConfigPort) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "daemon",
 		Short: "Manage the background reminder daemon",
@@ -257,7 +306,10 @@ func daemonCmd(svc *app.ReminderService, cfg *configHelper) *cobra.Command {
 			Use:   "start",
 			Short: "Start the daemon in the foreground (use systemd for background)",
 			RunE: func(cmd *cobra.Command, args []string) error {
-				intervalStr := cfg.get("reminder.poll_interval", "30s")
+				intervalStr, _ := rc.Get("reminder.poll_interval")
+				if intervalStr == "" {
+					intervalStr = "30s"
+				}
 				interval, err := time.ParseDuration(intervalStr)
 				if err != nil {
 					interval = 30 * time.Second
@@ -265,7 +317,7 @@ func daemonCmd(svc *app.ReminderService, cfg *configHelper) *cobra.Command {
 				ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 				defer stop()
 				fmt.Printf("daemon started  poll-interval=%s  Ctrl+C to stop\n", interval)
-				return svc.RunDaemon(ctx, interval)
+				return (*svc).RunDaemon(ctx, interval)
 			},
 		},
 		&cobra.Command{
@@ -281,22 +333,36 @@ func daemonCmd(svc *app.ReminderService, cfg *configHelper) *cobra.Command {
 
 // --- config ---
 
-func configCmd(cfg ports.ConfigPort) *cobra.Command {
+func configCmd(rc *rcfile.Config, rcPath string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
-		Short: "Manage rememberit configuration",
+		Short: "Manage lore configuration (~/.lorerc)",
+		// Config subcommands do not need the DB or AI client.
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error { return nil },
 	}
 
 	cmd.AddCommand(
 		&cobra.Command{
-			Use:   "set <key> <value>",
-			Short: "Set a config value",
-			Args:  cobra.ExactArgs(2),
+			Use:   "init",
+			Short: "Create ~/.lorerc with commented defaults",
 			RunE: func(cmd *cobra.Command, args []string) error {
-				if err := cfg.Set(args[0], args[1]); err != nil {
+				if err := rc.Init(); err != nil {
 					return err
 				}
-				fmt.Printf("set %s = %s\n", args[0], args[1])
+				fmt.Printf("created %s\n", rcPath)
+				fmt.Println("edit it with your preferred text editor to configure lore.")
+				return nil
+			},
+		},
+		&cobra.Command{
+			Use:   "set <key> <value>",
+			Short: "Set a config value in ~/.lorerc",
+			Args:  cobra.ExactArgs(2),
+			RunE: func(cmd *cobra.Command, args []string) error {
+				if err := rc.Set(args[0], args[1]); err != nil {
+					return err
+				}
+				fmt.Printf("set %s = %s  (in %s)\n", args[0], args[1], rcPath)
 				return nil
 			},
 		},
@@ -305,12 +371,12 @@ func configCmd(cfg ports.ConfigPort) *cobra.Command {
 			Short: "Get a config value",
 			Args:  cobra.ExactArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
-				v, err := cfg.Get(args[0])
+				v, err := rc.Get(args[0])
 				if err != nil {
 					return err
 				}
 				if v == "" {
-					fmt.Println("(not set)")
+					fmt.Println("(not set — using default)")
 				} else {
 					fmt.Println(v)
 				}
@@ -319,14 +385,15 @@ func configCmd(cfg ports.ConfigPort) *cobra.Command {
 		},
 		&cobra.Command{
 			Use:   "list",
-			Short: "List all config values",
+			Short: "List all values in ~/.lorerc",
 			RunE: func(cmd *cobra.Command, args []string) error {
-				all, err := cfg.All()
+				all, err := rc.All()
 				if err != nil {
 					return err
 				}
 				if len(all) == 0 {
-					fmt.Println("(no config set — all defaults in use)")
+					fmt.Printf("no config set in %s — all defaults in use.\n", rcPath)
+					fmt.Println("run: lore config init   to create a config file")
 					return nil
 				}
 				w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
@@ -334,6 +401,14 @@ func configCmd(cfg ports.ConfigPort) *cobra.Command {
 					fmt.Fprintf(w, "%s\t%s\n", k, v)
 				}
 				return w.Flush()
+			},
+		},
+		&cobra.Command{
+			Use:   "path",
+			Short: "Print the path to the config file",
+			RunE: func(cmd *cobra.Command, args []string) error {
+				fmt.Println(rcPath)
+				return nil
 			},
 		},
 	)
@@ -403,15 +478,13 @@ func relTime(t time.Time) string {
 	if future {
 		d = -d
 	}
-
 	var s string
 	switch {
 	case d < time.Minute:
-		s = "just now"
 		if future {
 			return "in a moment"
 		}
-		return s
+		return "just now"
 	case d < time.Hour:
 		s = fmt.Sprintf("%d min", int(d.Minutes()))
 	case d < 24*time.Hour:
@@ -419,14 +492,11 @@ func relTime(t time.Time) string {
 	default:
 		s = fmt.Sprintf("%d days", int(d.Hours()/24))
 	}
-
 	if future {
 		return "in " + s
 	}
 	return s + " ago"
 }
-
-// --- system helpers ---
 
 func dataDirectory() (string, error) {
 	var base string
@@ -439,7 +509,7 @@ func dataDirectory() (string, error) {
 		}
 		base = filepath.Join(home, ".local", "share")
 	}
-	dir := filepath.Join(base, "rememberit")
+	dir := filepath.Join(base, "lore")
 	return dir, os.MkdirAll(dir, 0o700)
 }
 
@@ -449,7 +519,7 @@ func installSystemdService() error {
 		return err
 	}
 	service := fmt.Sprintf(`[Unit]
-Description=rememberit reminder daemon
+Description=lore reminder daemon
 After=graphical-session.target
 
 [Service]
@@ -465,27 +535,11 @@ WantedBy=default.target
 	if err := os.MkdirAll(svcDir, 0o755); err != nil {
 		return err
 	}
-	svcPath := filepath.Join(svcDir, "rememberit.service")
+	svcPath := filepath.Join(svcDir, "lore.service")
 	if err := os.WriteFile(svcPath, []byte(service), 0o644); err != nil {
 		return err
 	}
 	fmt.Printf("installed: %s\n", svcPath)
-	fmt.Println("enable  : systemctl --user enable --now rememberit")
+	fmt.Println("enable  : systemctl --user enable --now lore")
 	return nil
-}
-
-// --- configHelper ---
-// Thin wrapper to read config values with inline defaults,
-// used only during wiring in main — not part of the domain.
-
-type configHelper struct {
-	cfg ports.ConfigPort
-}
-
-func (c *configHelper) get(key, defaultVal string) string {
-	v, err := c.cfg.Get(key)
-	if err != nil || v == "" {
-		return defaultVal
-	}
-	return v
 }

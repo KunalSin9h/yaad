@@ -1,4 +1,4 @@
-# rememberit — Implementation Plan
+# lore — Implementation Plan
 
 Track progress here. Check off items as they are completed.
 
@@ -6,7 +6,7 @@ Track progress here. Check off items as they are completed.
 
 ## Phase 1 — Project Scaffold
 
-- [x] `go mod init github.com/kunalsingh/rememberit`
+- [x] `go mod init github.com/kunalsingh/lore`
 - [x] Create full directory structure (`cmd`, `internal/domain`, `internal/ports`, `internal/app`, `internal/adapters`)
 - [x] Add core dependencies to `go.mod`:
   - [x] `github.com/spf13/cobra` — CLI
@@ -14,7 +14,7 @@ Track progress here. Check off items as they are completed.
   - [x] `github.com/olebedev/when` — natural language time parsing (used directly via HTTP, no Ollama SDK needed)
   - [x] `github.com/oklog/ulid/v2` — sortable unique IDs
   - [x] `golang.org/x/sync` — errgroup for parallel AI calls
-- [x] `cmd/rememberit/main.go` — entry point, root cobra command, wire dependencies
+- [x] `cmd/lore/main.go` — entry point, root cobra command, wire dependencies
 
 ---
 
@@ -110,28 +110,28 @@ Track progress here. Check off items as they are completed.
 
 ## Phase 9 — CLI Commands (Cobra)
 
-- [x] `rememberit add` command
+- [x] `lore add` command
   - [x] Flags: `--for`, `--remind`, `--type`, `--tag`
   - [x] Call `MemoryService.Add()`
   - [x] Print confirmation with ID, type, tags, remind_at
-- [x] `rememberit ask` command
+- [x] `lore ask` command
   - [x] Accept question as positional arg
   - [x] Print LLM answer
-- [x] `rememberit list` command
+- [x] `lore list` command
   - [x] Flags: `--type`, `--tag`, `--limit`, `--remind`
   - [x] Render table: ID (short), type, content (truncated), for_label, created_at (relative)
-- [x] `rememberit get` command
+- [x] `lore get` command
   - [x] By full ID
   - [x] Print full memory details
-- [x] `rememberit delete` command
+- [x] `lore delete` command
   - [x] Confirm prompt before deleting (`--force` to skip)
-- [x] `rememberit check` command
+- [x] `lore check` command
   - [x] Silent unless reminders are due
   - [x] Designed for `PROMPT_COMMAND` integration
-- [x] `rememberit daemon` command
+- [x] `lore daemon` command
   - [x] `start` — run poll loop in foreground (systemd manages background)
   - [x] `install` — write systemd user service file
-- [x] `rememberit config` command
+- [x] `lore config` command
   - [x] `set <key> <value>`
   - [x] `get <key>`
   - [x] `list`
@@ -140,7 +140,7 @@ Track progress here. Check off items as they are completed.
 
 ## Phase 10 — Wiring (Dependency Injection)
 
-- [x] `cmd/rememberit/main.go`
+- [x] `cmd/lore/main.go`
   - [x] Determine DB path (XDG_DATA_HOME aware)
   - [x] Instantiate SQLiteAdapter (shared DB for Store + Config)
   - [x] Instantiate OllamaAdapter (direct HTTP, no SDK dependency)
@@ -157,7 +157,7 @@ Track progress here. Check off items as they are completed.
 - [ ] Unit tests for `ReminderService.CheckAndFire()` with mock adapters
 - [ ] Integration test: SQLite adapter round-trip (save → list → delete)
 - [ ] Integration test: Ollama embed + FindSimilar
-- [ ] `rememberit check` shell integration docs in README
+- [ ] `lore check` shell integration docs in README
 - [x] Graceful handling: Ollama not running → skip embed, save with empty embedding, warn user
 - [x] `--help` text for all commands reviewed and accurate
 
@@ -166,8 +166,8 @@ Track progress here. Check off items as they are completed.
 ## Phase 12 — Distribution
 
 - [x] `Makefile` with `build`, `install`, `test` targets
-- [ ] `go install github.com/kunalsingh/rememberit/cmd/rememberit@latest` works
-- [ ] Systemd service template at `contrib/rememberit.service`
+- [ ] `go install github.com/kunalsingh/lore/cmd/rememberit@latest` works
+- [ ] Systemd service template at `contrib/lore.service`
 
 ---
 

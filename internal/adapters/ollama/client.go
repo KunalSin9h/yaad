@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/kunalsin9h/rememberit/internal/domain"
-	"github.com/kunalsin9h/rememberit/internal/ports"
+	"github.com/kunalsin9h/lore/internal/domain"
+	"github.com/kunalsin9h/lore/internal/ports"
 )
 
 // Compile-time interface check.
