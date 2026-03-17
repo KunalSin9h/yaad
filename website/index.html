@@ -401,6 +401,10 @@
     .feature-card.c-blue   { --card-color: var(--blue);   --card-glow: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(96,165,250,.06), transparent); }
     .feature-card.c-purple { --card-color: var(--purple); --card-glow: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(192,132,252,.06), transparent); }
     .feature-card.c-cyan   { --card-color: var(--cyan);   --card-glow: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(34,211,238,.06), transparent); }
+    .feature-card.c-orange { --card-color: var(--orange); --card-glow: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(251,146,60,.06), transparent); }
+
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+    .demo-cursor { animation: blink 1s step-end infinite; color: var(--orange); }
     .feature-card:hover { border-left-color: var(--card-color); }
 
     .feature-icon {
@@ -758,6 +762,19 @@
           </svg>
         </div>
         <span class="sr-only">recall</span>
+        <h3>Query-first memory</h3>
+        <p>Ask in plain English. Local embeddings + LLM reasoning find what you saved, even weeks later.</p>
+      </div>
+      <div class="feature-card c-amber">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 12h10"></path>
+            <path d="M14 8l4 4-4 4"></path>
+            <path d="M4 6h5"></path>
+            <path d="M4 18h5"></path>
+          </svg>
+        </div>
+        <span class="sr-only">hybrid retrieval</span>
         <h3>Hybrid retrieval</h3>
         <p>BM25 keyword search + semantic vector search merged via Reciprocal Rank Fusion. Catches exact names <em>and</em> fuzzy semantics in one pass.</p>
       </div>
@@ -797,6 +814,19 @@
         <span class="sr-only">resilience</span>
         <h3>Offline-safe</h3>
         <p>Memories save even when Ollama is down. AI enrichment degrades gracefully, never blocking saves.</p>
+      </div>
+      <div class="feature-card c-orange" id="demo-card" style="cursor:default">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <polyline points="4 17 10 11 4 5"></polyline>
+            <line x1="12" y1="19" x2="20" y2="19"></line>
+          </svg>
+        </div>
+        <h3>Watch it think <span style="font-size:.7em;font-weight:400;color:var(--dim)">· hover to pause</span></h3>
+        <div style="font-family:'SF Mono','Fira Code',monospace;font-size:.78rem;line-height:1.9;margin-top:.6rem;min-height:3.8rem">
+          <div><span style="color:var(--green);font-weight:700">❯ </span><span id="demo-text"></span><span class="demo-cursor">▌</span></div>
+          <div id="demo-out" style="color:var(--cyan);padding-left:1.1rem;min-height:1.4rem"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -987,5 +1017,50 @@ systemctl --user status yaad</pre>
   <span>Built by <a href="https://github.com/KunalSin9h" target="_blank" rel="noopener">Kunal Singh</a></span>
 </footer>
 
+<script>
+(function () {
+  const demos = [
+    { cmd: 'yaad ask "where was I with the auth refactor?"',  out: 'claude --resume 3fa2c891...\n  ↳ auth middleware rewrite' },
+    { cmd: 'yaad ask "prod db connection string?"',           out: 'rds.internal:5432/payments\n  ↳ payments-api infra' },
+    { cmd: 'yaad add "nginx: proxy_pass http://localhost:3000"', out: 'saved  [command]' },
+    { cmd: 'yaad ask "everything I know about Alice"',        out: '4 memories — PR reviews, on-call, design doc' },
+    { cmd: 'yaad ask "that go sqlite driver with no CGO"',    out: 'modernc.org/sqlite — pure Go, no CGO needed' },
+  ];
+
+  var di = 0, ci = 0, phase = 'typing', paused = false;
+  var textEl = document.getElementById('demo-text');
+  var outEl  = document.getElementById('demo-out');
+  var card   = document.getElementById('demo-card');
+
+  if (!textEl) return;
+
+  card.addEventListener('mouseenter', function () { paused = true; });
+  card.addEventListener('mouseleave', function () { paused = false; });
+
+  function tick() {
+    if (paused) { setTimeout(tick, 100); return; }
+    var d = demos[di];
+    if (phase === 'typing') {
+      if (ci < d.cmd.length) {
+        textEl.textContent = d.cmd.slice(0, ++ci);
+        setTimeout(tick, 38 + Math.random() * 28);
+      } else {
+        phase = 'showing';
+        outEl.textContent = '  ' + d.out.split('\n').join('\n  ');
+        setTimeout(tick, 2200);
+      }
+    } else {
+      textEl.textContent = '';
+      outEl.textContent  = '';
+      ci = 0;
+      di = (di + 1) % demos.length;
+      phase = 'typing';
+      setTimeout(tick, 500);
+    }
+  }
+
+  tick();
+})();
+</script>
 </body>
 </html>
