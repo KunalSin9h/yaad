@@ -27,7 +27,7 @@ builds:
 
 archives:
   - id: yaad
-    builds: [yaad]
+    ids: [yaad]
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     format_overrides:
       - goos: windows
