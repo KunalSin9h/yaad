@@ -55,7 +55,7 @@ func run() error {
 
 	root := &cobra.Command{
 		Use:   "yaad",
-		Short: "AI-native terminal memory and reminder system",
+		Short: "AI-native memory, recall and reminder on the terminal",
 		Long: `yaad — save anything from your terminal, recall it with natural language.
 
 Examples:

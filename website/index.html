@@ -3,24 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>yaad — AI-native terminal memory</title>
+  <title>yaad — AI-native memory, recall and reminder on the terminal</title>
   <meta name="description" content="Save anything from your terminal and recall it later with natural language. Everything runs locally. No cloud, no accounts." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0c0c0e;
-      --bg2:       #111114;
-      --bg3:       #18181d;
-      --border:    #242429;
-      --text:      #e2e2e8;
-      --muted:     #7a7a8a;
-      --green:     #4ade80;
-      --cyan:      #22d3ee;
-      --purple:    #a78bfa;
-      --orange:    #fb923c;
-      --red:       #f87171;
-      --radius:    8px;
+      --bg:      #0c0b09;
+      --bg2:     #141311;
+      --bg3:     #1c1a17;
+      --bg4:     #252320;
+      --border:  #2e2b26;
+      --border2: #3d3a33;
+      --text:    #f0ede6;
+      --muted:   #888580;
+      --dim:     #52504a;
+
+      --green:   #4ade80;
+      --amber:   #fbbf24;
+      --rose:    #fb7185;
+      --blue:    #60a5fa;
+      --purple:  #c084fc;
+      --cyan:    #22d3ee;
+      --orange:  #fb923c;
     }
 
     html { scroll-behavior: smooth; }
@@ -28,282 +36,481 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
+      font-family: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
     }
 
-    a { color: var(--cyan); text-decoration: none; }
+    a { color: var(--green); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    code, pre, .mono {
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", "Courier New", monospace;
+    }
 
     /* ─── NAV ─── */
     nav {
       position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 2rem;
-      height: 56px;
-      background: rgba(12,12,14,.85);
-      backdrop-filter: blur(12px);
+      height: 52px;
+      background: rgba(12,11,9,.92);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
     }
     .nav-logo {
-      font-family: "SF Mono", "Fira Code", monospace;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: var(--green);
+      font-family: "Baloo 2", "Manrope", sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text);
       letter-spacing: -.5px;
     }
-    .nav-logo span { color: var(--muted); font-weight: 400; }
-    .nav-links { display: flex; gap: 1.5rem; font-size: .9rem; color: var(--muted); }
-    .nav-links a { color: var(--muted); }
+    .nav-logo .tilde { color: var(--dim); font-weight: 400; }
+    .nav-links { display: flex; gap: 2rem; font-size: .82rem; font-weight: 500; letter-spacing: .01em; }
+    .nav-links a { color: var(--muted); transition: color .15s; }
     .nav-links a:hover { color: var(--text); text-decoration: none; }
     .nav-gh {
       display: flex; align-items: center; gap: .4rem;
-      padding: .35rem .85rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: .85rem;
+      padding: .3rem .9rem;
+      border: 1px solid var(--border2);
+      font-size: .8rem; font-weight: 600; letter-spacing: .02em;
       color: var(--text);
       background: var(--bg3);
-      transition: border-color .15s;
+      transition: border-color .15s, background .15s;
+      font-family: "Manrope", sans-serif;
     }
-    .nav-gh:hover { border-color: var(--muted); text-decoration: none; }
+    .nav-gh:hover { border-color: var(--green); background: var(--bg4); text-decoration: none; }
 
     /* ─── HERO ─── */
     .hero {
-      max-width: 860px; margin: 0 auto;
-      padding: 6rem 2rem 4rem;
+      max-width: 900px; margin: 0 auto;
+      padding: 5rem 2rem 4.5rem;
       text-align: center;
+      position: relative;
     }
-    .hero-badge {
+    .hero-bg {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(46,43,38,.7) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      mask-image: radial-gradient(ellipse 80% 70% at 50% 30%, black 30%, transparent 100%);
+    }
+    .hero-glow {
+      position: absolute;
+      top: 50px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(74,222,128,.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero > * { position: relative; }
+
+    .hero-art {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 3.75rem;
+    }
+    .hero-wordmark {
+      font-family: "Baloo 2", "Manrope", sans-serif;
+      font-size: clamp(3.2rem, 10vw, 7rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: .95;
+      background: linear-gradient(120deg, #9cffb0 0%, #7dd3fc 40%, #fbbf24 70%, #fb7185 100%);
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 12px 40px rgba(74,222,128,.12);
+    }
+    .hero-orbit {
+      width: min(520px, 80vw);
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: .6rem;
+    }
+    .orbit-tile {
+      height: 42px;
+      border-radius: 16px;
+      border: 1px solid var(--border2);
+      background: linear-gradient(135deg, rgba(74,222,128,.14), rgba(96,165,250,.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .orbit-tile.alt {
+      background: linear-gradient(135deg, rgba(251,191,36,.18), rgba(251,113,133,.12));
+    }
+
+    .hero-pill {
       display: inline-flex; align-items: center; gap: .5rem;
-      padding: .3rem .9rem;
-      border: 1px solid var(--border);
+      padding: .25rem .85rem;
+      border: 1px solid var(--border2);
       border-radius: 999px;
-      font-size: .8rem; color: var(--muted);
-      margin-bottom: 1.5rem;
+      font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.75rem;
       background: var(--bg3);
     }
-    .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+    .hero-pill .blink {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; } 50% { opacity: .3; }
+    }
+
     h1 {
-      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-family: "Baloo 2", "Manrope", sans-serif;
+      font-size: clamp(2.3rem, 5vw, 3.6rem);
       font-weight: 800;
       line-height: 1.15;
-      letter-spacing: -.03em;
-      margin-bottom: 1.25rem;
+      letter-spacing: -.04em;
+      margin-bottom: 1.1rem;
+      color: var(--text);
     }
-    h1 em { font-style: normal; color: var(--green); }
+    h1 .hi { color: var(--green); }
+    h1 .dim { color: var(--muted); }
+
     .hero-sub {
-      font-size: 1.15rem; color: var(--muted);
-      max-width: 560px; margin: 0 auto 2.5rem;
-      line-height: 1.7;
+      font-size: 1.1rem; color: var(--muted);
+      max-width: 540px; margin: 0 auto 2.75rem;
+      line-height: 1.8;
+      font-weight: 400;
     }
+
     .hero-actions {
-      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
-      margin-bottom: 3.5rem;
+      display: flex; gap: .85rem; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 4rem;
     }
     .btn-primary {
-      padding: .65rem 1.4rem;
+      padding: .7rem 1.7rem;
       background: var(--green);
-      color: #0c0c0e;
-      font-weight: 700; font-size: .95rem;
-      border-radius: var(--radius);
-      transition: opacity .15s;
+      color: #0a1a0f;
+      font-weight: 700; font-size: .98rem;
+      border: none;
+      font-family: "Manrope", sans-serif;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      letter-spacing: .01em;
     }
-    .btn-primary:hover { opacity: .85; text-decoration: none; }
+    .btn-primary:hover { opacity: .88; text-decoration: none; transform: translateY(-1px); }
     .btn-ghost {
-      padding: .65rem 1.4rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: .95rem; color: var(--text);
+      padding: .7rem 1.7rem;
+      border: 1px solid var(--border2);
+      font-size: .98rem; color: var(--text);
       background: var(--bg3);
-      transition: border-color .15s;
+      font-family: "Manrope", sans-serif;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      letter-spacing: .01em;
+      font-weight: 500;
     }
-    .btn-ghost:hover { border-color: var(--muted); text-decoration: none; }
+    .btn-ghost:hover { border-color: var(--muted); background: var(--bg4); text-decoration: none; }
+
+    /* ─── MARQUEE ─── */
+    .marquee-wrap {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: .7rem 0;
+      background: var(--bg2);
+    }
+    .marquee-track {
+      display: flex;
+      gap: 3rem;
+      white-space: nowrap;
+      animation: marquee 28s linear infinite;
+      width: max-content;
+    }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .marquee-item {
+      font-family: "SF Mono", monospace;
+      font-size: .75rem;
+      color: var(--dim);
+      display: flex; align-items: center; gap: .75rem;
+      flex-shrink: 0;
+    }
+    .marquee-item .cmd { color: var(--muted); }
+    .marquee-item .str { color: var(--amber); }
+    .marquee-item .flag { color: var(--purple); }
+    .marquee-item .sep { color: var(--border2); }
 
     /* ─── TERMINAL ─── */
     .terminal {
-      background: var(--bg3);
+      background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: 12px;
       overflow: hidden;
       text-align: left;
-      max-width: 700px;
+      max-width: 680px;
       margin: 0 auto;
-      box-shadow: 0 24px 64px rgba(0,0,0,.4);
+      box-shadow: 0 32px 64px rgba(0,0,0,.5), 0 0 0 1px var(--border);
     }
     .terminal-bar {
       display: flex; align-items: center; gap: .45rem;
-      padding: .75rem 1rem;
-      background: var(--bg2);
+      padding: .65rem 1rem;
+      background: var(--bg3);
       border-bottom: 1px solid var(--border);
     }
-    .dot-red   { width:12px;height:12px;border-radius:50%;background:#f87171; }
-    .dot-yellow{ width:12px;height:12px;border-radius:50%;background:#fbbf24; }
-    .dot-green { width:12px;height:12px;border-radius:50%;background:#4ade80; }
+    .tb-dot { width: 11px; height: 11px; border-radius: 50%; }
+    .tb-r { background: #f87171; } .tb-y { background: #fbbf24; } .tb-g { background: #4ade80; }
+    .terminal-title { font-family: "SF Mono", monospace; font-size: .7rem; color: var(--dim); margin-left: .5rem; }
     .terminal-body {
       padding: 1.25rem 1.5rem;
       font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
-      font-size: .85rem;
+      font-size: .9rem;
       line-height: 1.9;
     }
-    .t-prompt { color: var(--green); }
+    .t-prompt { color: var(--green); font-weight: 700; }
     .t-cmd    { color: var(--text); }
     .t-flag   { color: var(--purple); }
-    .t-str    { color: var(--orange); }
-    .t-out    { color: var(--muted); }
+    .t-str    { color: var(--amber); }
+    .t-out    { color: var(--dim); }
     .t-ans    { color: var(--cyan); }
-    .t-blank  { display: block; height: .5rem; }
+    .t-blank  { display: block; height: .4rem; }
 
     /* ─── SECTIONS ─── */
-    section { padding: 5rem 2rem; }
-    .section-inner { max-width: 1000px; margin: 0 auto; }
-    .section-label {
-      font-size: .75rem; font-weight: 700; letter-spacing: .12em;
-      text-transform: uppercase; color: var(--green);
-      margin-bottom: .75rem;
+    section { padding: 5.5rem 2rem; }
+    .section-inner { max-width: 1020px; margin: 0 auto; }
+
+    .label {
+      display: inline-flex; align-items: center;
+      font-family: "SF Mono", monospace;
+      font-size: .68rem; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: .9rem;
+      opacity: .85;
     }
+    .label::before { content: "[ "; }
+    .label::after  { content: " ]"; }
+    .label.green  { color: var(--green); }
+    .label.amber  { color: var(--amber); }
+    .label.rose   { color: var(--rose); }
+    .label.blue   { color: var(--blue); }
+    .label.purple { color: var(--purple); }
+    .label.cyan   { color: var(--cyan); }
+
     h2 {
-      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-family: "Baloo 2", "Manrope", sans-serif;
+      font-size: clamp(1.8rem, 3.2vw, 2.6rem);
       font-weight: 800; letter-spacing: -.02em;
-      margin-bottom: 1rem;
+      margin-bottom: .9rem;
+      line-height: 1.2;
     }
     .section-lead {
       color: var(--muted); font-size: 1.05rem;
-      max-width: 560px; margin-bottom: 3rem;
+      max-width: 600px; margin-bottom: 3rem;
+      line-height: 1.8;
     }
 
-    /* ─── FEATURES GRID ─── */
+    /* ─── FEATURES ─── */
+    #features { border-top: 1px solid var(--border); }
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 1px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
       background: var(--border);
+      border: 1px solid var(--border);
     }
     .feature-card {
-      background: var(--bg2);
-      padding: 1.75rem;
-      transition: background .15s;
+      background: var(--bg);
+      padding: 2rem;
+      border-left: 3px solid transparent;
+      transition: background .15s, border-color .15s;
+      position: relative;
+      overflow: hidden;
     }
-    .feature-card:hover { background: var(--bg3); }
+    .feature-card::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: var(--card-glow, transparent);
+      opacity: 0;
+      transition: opacity .2s;
+      pointer-events: none;
+    }
+    .feature-card:hover { background: var(--bg2); }
+    .feature-card:hover::after { opacity: 1; }
+
+    .feature-card.c-green  { --card-color: var(--green);  --card-glow: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(74,222,128,.06), transparent); }
+    .feature-card.c-amber  { --card-color: var(--amber);  --card-glow: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(251,191,36,.06), transparent); }
+    .feature-card.c-rose   { --card-color: var(--rose);   --card-glow: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(251,113,133,.06), transparent); }
+    .feature-card.c-blue   { --card-color: var(--blue);   --card-glow: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(96,165,250,.06), transparent); }
+    .feature-card.c-purple { --card-color: var(--purple); --card-glow: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(192,132,252,.06), transparent); }
+    .feature-card.c-cyan   { --card-color: var(--cyan);   --card-glow: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(34,211,238,.06), transparent); }
+    .feature-card:hover { border-left-color: var(--card-color); }
+
     .feature-icon {
-      font-size: 1.5rem;
-      margin-bottom: .85rem;
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      border: 1px solid var(--border2);
+      display: grid;
+      place-items: center;
+      color: var(--card-color);
+      background: rgba(255,255,255,.02);
+      margin-bottom: 1rem;
     }
-    .feature-card h3 {
-      font-size: 1rem; font-weight: 700;
-      margin-bottom: .4rem;
+    .feature-icon svg {
+      width: 30px;
+      height: 30px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
-    .feature-card p { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; letter-spacing: -.01em; }
+    .feature-card p  { font-size: .95rem; color: var(--muted); line-height: 1.75; }
 
     /* ─── INSTALL ─── */
     #install { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .install-steps { display: flex; flex-direction: column; gap: 1.25rem; }
-    .step {
-      display: flex; gap: 1.25rem; align-items: flex-start;
-    }
+    .install-steps { display: flex; flex-direction: column; gap: 2rem; }
+    .step { display: flex; gap: 1.5rem; align-items: flex-start; }
     .step-num {
       flex-shrink: 0;
       width: 28px; height: 28px;
-      border-radius: 50%;
-      background: var(--bg3);
-      border: 1px solid var(--border);
+      border: 1px solid var(--border2);
       display: flex; align-items: center; justify-content: center;
-      font-size: .78rem; font-weight: 700; color: var(--muted);
+      font-family: "SF Mono", monospace;
+      font-size: .72rem; font-weight: 700; color: var(--green);
+      background: var(--bg3);
       margin-top: .1rem;
     }
-    .step-body h4 { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
-    .step-body p  { font-size: .88rem; color: var(--muted); margin-bottom: .6rem; }
+    .step-body h4 { font-size: .92rem; font-weight: 700; margin-bottom: .4rem; letter-spacing: -.01em; }
+    .step-body p  { font-size: .95rem; color: var(--muted); margin-bottom: .65rem; line-height: 1.7; }
     pre {
       background: var(--bg3);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: .75rem 1.1rem;
+      border: 1px solid var(--border2);
+      padding: .9rem 1.2rem;
       font-family: "SF Mono", "Fira Code", monospace;
-      font-size: .83rem;
+      font-size: .8rem;
       overflow-x: auto;
       color: var(--text);
-      line-height: 1.7;
+      line-height: 1.75;
     }
-    code { font-family: "SF Mono", "Fira Code", monospace; font-size: .85em; color: var(--cyan); }
+    pre .c { color: var(--dim); }
+    pre .s { color: var(--amber); }
+    pre .k { color: var(--green); }
+    code {
+      font-family: "SF Mono", monospace;
+      font-size: .82em;
+      color: var(--cyan);
+      background: var(--bg3);
+      padding: .1em .35em;
+      border: 1px solid var(--border);
+    }
 
-    /* ─── COMMANDS ─── */
+    /* ─── USAGE ─── */
+    #usage { border-top: 1px solid var(--border); }
     .commands-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1rem;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 2.5rem;
     }
     .cmd-card {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.25rem;
+      background: var(--bg);
+      padding: 1.3rem 1.5rem;
+      transition: background .12s;
     }
-    .cmd-card .cmd-name {
-      font-family: "SF Mono", "Fira Code", monospace;
-      font-size: .88rem;
-      color: var(--green);
-      font-weight: 700;
-      margin-bottom: .35rem;
+    .cmd-card:hover { background: var(--bg2); }
+    .cmd-name {
+      font-family: "SF Mono", monospace;
+      font-size: .92rem; color: var(--green); font-weight: 700;
+      margin-bottom: .4rem;
     }
-    .cmd-card p { font-size: .875rem; color: var(--muted); }
+    .cmd-card p { font-size: .95rem; color: var(--muted); line-height: 1.65; }
 
     /* ─── REMINDERS ─── */
     #reminders { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     .reminder-options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: grid; grid-template-columns: 1fr 1fr;
       gap: 1.5rem;
     }
     @media (max-width: 640px) { .reminder-options { grid-template-columns: 1fr; } }
     .reminder-card {
-      background: var(--bg3);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      background: var(--bg);
       padding: 1.75rem;
+      transition: border-color .15s;
     }
-    .reminder-card h3 {
-      font-size: 1rem; font-weight: 700;
-      margin-bottom: .35rem;
+    .reminder-card:hover { border-color: var(--border2); }
+    .reminder-card h3 { font-size: 1.02rem; font-weight: 700; margin-bottom: .4rem; letter-spacing: -.01em; }
+    .reminder-card p  { font-size: .95rem; color: var(--muted); margin-bottom: .85rem; line-height: 1.7; }
+
+    /* ─── CTA ─── */
+    #cta {
+      text-align: center;
+      padding: 6rem 2rem;
+      border-top: 1px solid var(--border);
+      position: relative; overflow: hidden;
     }
-    .reminder-card .badge {
-      display: inline-block;
-      font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-      padding: .15rem .5rem;
-      border-radius: 4px;
-      margin-bottom: .75rem;
+    #cta::before {
+      content: "";
+      position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 400px;
+      background: radial-gradient(ellipse, rgba(74,222,128,.07) 0%, transparent 65%);
+      pointer-events: none;
     }
-    .badge-green { background: rgba(74,222,128,.12); color: var(--green); }
-    .badge-cyan  { background: rgba(34,211,238,.12); color: var(--cyan); }
-    .reminder-card p { font-size: .875rem; color: var(--muted); margin-bottom: .85rem; }
+    .cta-inner { position: relative; max-width: 540px; margin: 0 auto; }
+    #cta h2 { font-size: clamp(1.8rem, 3.5vw, 2.6rem); margin-bottom: .75rem; }
+    #cta p  { color: var(--muted); margin-bottom: 2.25rem; font-size: 1.05rem; line-height: 1.8; }
+    .install-cmd {
+      display: inline-flex; align-items: center; gap: 1rem;
+      margin-top: 2rem;
+      padding: .75rem 1.25rem;
+      border: 1px solid var(--border2);
+      background: var(--bg2);
+      font-family: "SF Mono", monospace;
+      font-size: .8rem;
+      color: var(--text);
+      cursor: text;
+      user-select: all;
+      transition: border-color .15s;
+    }
+    .install-cmd:hover { border-color: var(--green); }
+    .install-cmd .dollar { color: var(--green); }
 
     /* ─── FOOTER ─── */
     footer {
       border-top: 1px solid var(--border);
-      padding: 2.5rem 2rem;
+      padding: 1.75rem 2rem;
       text-align: center;
-      color: var(--muted);
-      font-size: .85rem;
+      color: var(--dim);
+      font-size: .8rem;
+      background: var(--bg2);
+      display: flex; align-items: center; justify-content: center; gap: 1.5rem;
+      flex-wrap: wrap;
     }
-    footer a { color: var(--muted); }
-    footer a:hover { color: var(--text); }
-
-    /* ─── DIVIDER ─── */
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin: 0 auto;
-      max-width: 600px;
-    }
+    footer a { color: var(--dim); transition: color .12s; }
+    footer a:hover { color: var(--muted); text-decoration: none; }
+    footer .sep { color: var(--border2); }
 
     @media (max-width: 600px) {
       nav { padding: 0 1rem; }
       .nav-links { display: none; }
       section { padding: 3.5rem 1.25rem; }
-      h1 { font-size: 2rem; }
+      h1 { font-size: 1.6rem; }
+      .hero-art { margin-bottom: 2.5rem; }
+      .hero-orbit { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
   </style>
 </head>
@@ -311,90 +518,188 @@
 
 <!-- ─── NAV ─── -->
 <nav>
-  <div class="nav-logo">yaad<span> ~</span></div>
+  <div class="nav-logo mono">yaad<span class="tilde"> ~$</span></div>
   <div class="nav-links">
-    <a href="#features">Features</a>
-    <a href="#install">Install</a>
-    <a href="#usage">Usage</a>
-    <a href="#reminders">Reminders</a>
+    <a href="#features">features</a>
+    <a href="#install">install</a>
+    <a href="#usage">usage</a>
+    <a href="#reminders">reminders</a>
   </div>
   <a href="https://github.com/KunalSin9h/yaad" class="nav-gh" target="_blank" rel="noopener">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
     GitHub
   </a>
 </nav>
 
 <!-- ─── HERO ─── -->
 <section class="hero">
-  <div class="hero-badge"><span class="dot"></span> Powered by Ollama — fully local</div>
-  <h1>Your terminal has a<br /><em>memory</em> now.</h1>
+  <div class="hero-bg"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-art">
+    <div class="hero-wordmark">yaad</div>
+    <div class="hero-orbit" aria-hidden="true">
+      <div class="orbit-tile">⌘</div>
+      <div class="orbit-tile alt">✦</div>
+      <div class="orbit-tile">⏱</div>
+      <div class="orbit-tile alt">∞</div>
+      <div class="orbit-tile">✉︎</div>
+    </div>
+  </div>
+
+  <div class="hero-pill">
+    <span class="blink"></span>
+    powered by ollama — runs fully local
+  </div>
+
+  <h1>Give your terminal a<br /><span class="hi">playful memory</span>.</h1>
   <p class="hero-sub">
-    Save commands, notes, URLs, and reminders from your terminal.
-    Recall anything later with natural language. No cloud. No accounts.
-    Everything runs on your machine.
+    Save commands, notes, URLs, facts, and reminders with one line.
+    Recall anything with natural language, right where you work.
   </p>
   <div class="hero-actions">
-    <a href="#install" class="btn-primary">Get started</a>
-    <a href="https://github.com/KunalSin9h/yaad" class="btn-ghost" target="_blank" rel="noopener">View on GitHub</a>
+    <a href="#install" class="btn-primary">Get started →</a>
+    <a href="https://github.com/KunalSin9h/yaad" class="btn-ghost" target="_blank" rel="noopener">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-.1em;margin-right:.3rem"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      View on GitHub
+    </a>
   </div>
 
   <div class="terminal">
     <div class="terminal-bar">
-      <div class="dot-red"></div>
-      <div class="dot-yellow"></div>
-      <div class="dot-green"></div>
+      <div class="tb-dot tb-r"></div>
+      <div class="tb-dot tb-y"></div>
+      <div class="tb-dot tb-g"></div>
+      <span class="terminal-title">~/dev — zsh</span>
     </div>
     <div class="terminal-body">
       <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644"</span> <span class="t-flag">--for</span> <span class="t-str">"yaad build session"</span></div>
-      <div class="t-out">  ✓ saved  [command] yaad build session</div>
+      <div class="t-out">  ✓ saved &nbsp;[command] yaad build session</div>
       <span class="t-blank"></span>
       <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"book conference ticket"</span> <span class="t-flag">--remind</span> <span class="t-str">"in 30 minutes"</span></div>
-      <div class="t-out">  ✓ saved  [reminder] due in 30 minutes</div>
+      <div class="t-out">  ✓ saved &nbsp;[reminder] due in 30 minutes</div>
       <span class="t-blank"></span>
       <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"which claude session was I building yaad in?"</span></div>
       <div class="t-ans">  You were using claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644</div>
-      <div class="t-ans">  (tagged as the yaad build session)</div>
+      <div class="t-ans">  tagged as: yaad build session</div>
     </div>
   </div>
 </section>
 
+<!-- ─── MARQUEE ─── -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <!-- first copy -->
+    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"deploy prod at 3pm"</span> <span class="flag">--remind</span> <span class="str">"in 2h"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"what's the staging db port?"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"https://docs.example.com/api"</span> <span class="flag">--tag</span> <span class="str">reference</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad list</span> <span class="flag">--remind</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"any pending reminders for today?"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"submit PR for review"</span> <span class="flag">--remind</span> <span class="str">"tomorrow 9am"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad get</span> <span class="str">01JTXK4A3B</span></span>
+    <span class="marquee-item sep">·</span>
+    <!-- second copy (for seamless loop) -->
+    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"deploy prod at 3pm"</span> <span class="flag">--remind</span> <span class="str">"in 2h"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"what's the staging db port?"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"https://docs.example.com/api"</span> <span class="flag">--tag</span> <span class="str">reference</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad list</span> <span class="flag">--remind</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"any pending reminders for today?"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"submit PR for review"</span> <span class="flag">--remind</span> <span class="str">"tomorrow 9am"</span></span>
+    <span class="marquee-item sep">·</span>
+    <span class="marquee-item"><span class="cmd">yaad get</span> <span class="str">01JTXK4A3B</span></span>
+    <span class="marquee-item sep">·</span>
+  </div>
+</div>
+
 <!-- ─── FEATURES ─── -->
 <section id="features">
   <div class="section-inner">
-    <div class="section-label">Features</div>
-    <h2>Everything you need, nothing more.</h2>
-    <p class="section-lead">Built for developers who live in the terminal and value privacy.</p>
+    <span class="label green">features</span>
+    <h2>Everything you need,<br />nothing you don't.</h2>
+    <p class="section-lead">Built for developers who live in the terminal and treat their privacy seriously.</p>
 
     <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🔍</div>
-        <h3>Natural language recall</h3>
-        <p>Ask questions in plain English. Local embeddings + LLM reasoning find exactly what you saved, even weeks later.</p>
+      <div class="feature-card c-green">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 12h10"></path>
+            <path d="M10 6l4 6-4 6"></path>
+            <circle cx="18" cy="12" r="3.5"></circle>
+          </svg>
+        </div>
+        <span class="sr-only">recall</span>
+        <h3>Natural language search</h3>
+        <p>Ask in plain English. Local embeddings + LLM reasoning find exactly what you saved, even weeks later.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔒</div>
+      <div class="feature-card c-amber">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 10V8a7 7 0 0114 0v2"></path>
+            <rect x="4" y="10" width="16" height="10" rx="2"></rect>
+            <circle cx="12" cy="15" r="2"></circle>
+          </svg>
+        </div>
+        <span class="sr-only">privacy</span>
         <h3>Fully local &amp; private</h3>
         <p>All AI runs via Ollama on your machine. Zero cloud, zero accounts, zero telemetry. Your data never leaves.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">⏰</div>
-        <h3>Smart reminders</h3>
-        <p>Parse natural time expressions like <code>"in 30 minutes"</code>, <code>"tomorrow 9am"</code>, <code>"Friday 3pm"</code> into real deadlines.</p>
+      <div class="feature-card c-rose">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="7"></circle>
+            <path d="M12 8v4l3 2"></path>
+          </svg>
+        </div>
+        <span class="sr-only">reminders</span>
+        <h3>Smart time parsing</h3>
+        <p>Say <code>"in 30 minutes"</code>, <code>"tomorrow 9am"</code>, or <code>"Friday 3pm"</code>. yaad turns it into a real deadline.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🏷️</div>
+      <div class="feature-card c-blue">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 7h7v10H4z"></path>
+            <path d="M13 5h7v14h-7z"></path>
+            <path d="M7.5 10h0"></path>
+          </svg>
+        </div>
+        <span class="sr-only">context</span>
         <h3>Auto-enriched metadata</h3>
-        <p>Every memory captures working directory, hostname, and timestamp. AI auto-detects type and extracts tags.</p>
+        <p>Every memory captures cwd, hostname, and timestamp. AI auto-detects type and extracts tags for you.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">📴</div>
+      <div class="feature-card c-purple">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 12a6 6 0 1110 4"></path>
+            <path d="M10 12h8"></path>
+            <path d="M16 9l3 3-3 3"></path>
+          </svg>
+        </div>
+        <span class="sr-only">resilience</span>
         <h3>Offline-safe</h3>
-        <p>Memories save even when Ollama is unavailable. AI enrichment gracefully degrades — your data is never lost.</p>
+        <p>Memories save even when Ollama is unavailable. AI enrichment degrades gracefully — your data is never lost.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🧩</div>
+      <div class="feature-card c-cyan">
+        <div class="feature-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 6h6v6H4z"></path>
+            <path d="M14 6h6v6h-6z"></path>
+            <path d="M9 12h6v6H9z"></path>
+          </svg>
+        </div>
+        <span class="sr-only">architecture</span>
         <h3>Fully extensible</h3>
-        <p>Ports &amp; Adapters architecture. Swap storage, AI backend, or notifier by implementing a single interface.</p>
+        <p>Ports &amp; Adapters design. Swap the storage backend, AI provider, or notifier by implementing one interface.</p>
       </div>
     </div>
   </div>
@@ -403,7 +708,7 @@
 <!-- ─── INSTALL ─── -->
 <section id="install">
   <div class="section-inner">
-    <div class="section-label">Installation</div>
+    <span class="label amber">installation</span>
     <h2>Up and running in minutes.</h2>
     <p class="section-lead">Requires Go 1.21+ and Ollama running locally.</p>
 
@@ -413,15 +718,17 @@
         <div class="step-body">
           <h4>Install Ollama and pull models</h4>
           <p>Get Ollama from <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a>, then pull the required models.</p>
-          <pre>ollama pull nomic-embed-text   # embeddings
-ollama pull llama3.2:3b        # reasoning (swap for any chat model)</pre>
+          <pre><span class="c"># embeddings model</span>
+<span class="k">ollama pull</span> nomic-embed-text
+<span class="c"># chat / reasoning model (swap for any compatible one)</span>
+<span class="k">ollama pull</span> llama3.2:3b</pre>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
           <h4>Install yaad</h4>
-          <pre>go install github.com/kunalsin9h/yaad/cmd/yaad@latest</pre>
+          <pre><span class="k">go install</span> github.com/kunalsin9h/yaad/cmd/yaad@latest</pre>
         </div>
       </div>
       <div class="step">
@@ -435,7 +742,7 @@ ollama pull llama3.2:3b        # reasoning (swap for any chat model)</pre>
         <div class="step-num">4</div>
         <div class="step-body">
           <h4>Save your first memory</h4>
-          <pre>yaad add "hello world" --for "my first yaad memory"</pre>
+          <pre>yaad add <span class="s">"hello world"</span> <span class="k">--for</span> <span class="s">"my first yaad memory"</span></pre>
         </div>
       </div>
     </div>
@@ -445,7 +752,7 @@ ollama pull llama3.2:3b        # reasoning (swap for any chat model)</pre>
 <!-- ─── USAGE ─── -->
 <section id="usage">
   <div class="section-inner">
-    <div class="section-label">Usage</div>
+    <span class="label blue">usage</span>
     <h2>A command for every moment.</h2>
     <p class="section-lead">Five memory types, auto-detected by AI: <code>command</code> · <code>note</code> · <code>url</code> · <code>fact</code> · <code>reminder</code></p>
 
@@ -456,74 +763,72 @@ ollama pull llama3.2:3b        # reasoning (swap for any chat model)</pre>
       </div>
       <div class="cmd-card">
         <div class="cmd-name">yaad ask "&lt;question&gt;"</div>
-        <p>Query everything you've saved with natural language. The LLM reasons over semantic search results.</p>
+        <p>Query everything with natural language. The LLM reasons over semantic search results.</p>
       </div>
       <div class="cmd-card">
         <div class="cmd-name">yaad list [flags]</div>
-        <p>Browse recent memories. Filter by <code>--type</code>, <code>--tag</code>, or <code>--remind</code> (pending reminders only).</p>
+        <p>Browse recent memories. Filter by <code>--type</code>, <code>--tag</code>, or <code>--remind</code>.</p>
       </div>
       <div class="cmd-card">
         <div class="cmd-name">yaad get &lt;id&gt;</div>
-        <p>Show full details of a memory. Accepts 10-char ULID prefix — no need to type the full ID.</p>
+        <p>Show full details of a memory. Accepts a 10-char ULID prefix.</p>
       </div>
       <div class="cmd-card">
         <div class="cmd-name">yaad delete &lt;id&gt;</div>
-        <p>Delete a memory by ID. Prompts for confirmation; skip with <code>-y</code>.</p>
+        <p>Remove a memory by ID. Prompts for confirmation; skip with <code>-y</code>.</p>
       </div>
       <div class="cmd-card">
         <div class="cmd-name">yaad config init / set / get</div>
-        <p>Manage <code>~/.yaadrc</code>. Override Ollama URL, models, notifier, and reminder poll interval.</p>
+        <p>Manage <code>~/.yaadrc</code>. Override Ollama URL, models, notifier, and poll interval.</p>
       </div>
     </div>
 
-    <div style="margin-top: 2rem;">
-      <pre><span style="color:var(--muted)"># a command to resume later</span>
-yaad add "claude --resume 17a43487" --for "yaad build session"
+    <pre><span class="c"># save a command you'll want to resume</span>
+yaad add <span class="s">"claude --resume 17a43487"</span> <span class="k">--for</span> <span class="s">"yaad build session"</span>
 
-<span style="color:var(--muted)"># a fact with tags</span>
-yaad add "staging postgres is on port 5433" --tag postgres --tag staging
+<span class="c"># a fact with tags</span>
+yaad add <span class="s">"staging postgres is on port 5433"</span> <span class="k">--tag</span> postgres <span class="k">--tag</span> staging
 
-<span style="color:var(--muted)"># a time-sensitive reminder</span>
-yaad add "submit PR for review" --remind "tomorrow 9am"
+<span class="c"># a time-sensitive reminder</span>
+yaad add <span class="s">"submit PR for review"</span> <span class="k">--remind</span> <span class="s">"tomorrow 9am"</span>
 
-<span style="color:var(--muted)"># recall anything</span>
-yaad ask "what was the staging postgres port?"
-yaad ask "do I have anything due tonight?"</pre>
-    </div>
+<span class="c"># recall anything naturally</span>
+yaad ask <span class="s">"what was the staging postgres port?"</span>
+yaad ask <span class="s">"do I have anything due tonight?"</span></pre>
   </div>
 </section>
 
 <!-- ─── REMINDERS ─── -->
 <section id="reminders">
   <div class="section-inner">
-    <div class="section-label">Reminders</div>
-    <h2>Never forget a deadline.</h2>
+    <span class="label rose">reminders</span>
+    <h2>Never miss a deadline.</h2>
     <p class="section-lead">Two ways to surface reminders — pick what fits your workflow.</p>
 
     <div class="reminder-options">
       <div class="reminder-card">
-        <span class="badge badge-green">Recommended</span>
-        <h3>Inline — shell PROMPT_COMMAND</h3>
-        <p>Reminders surface directly in your terminal on every prompt. No background process required.</p>
-        <pre><span style="color:var(--muted)"># ~/.bashrc</span>
-export PROMPT_COMMAND="yaad check; $PROMPT_COMMAND"
+        <span class="label green" style="margin-bottom:.75rem">recommended</span>
+        <h3>Inline — PROMPT_COMMAND</h3>
+        <p>Reminders surface in your terminal on every prompt. No background process needed.</p>
+        <pre><span class="c"># ~/.bashrc</span>
+export PROMPT_COMMAND=<span class="s">"yaad check; $PROMPT_COMMAND"</span>
 
-<span style="color:var(--muted)"># ~/.zshrc</span>
+<span class="c"># ~/.zshrc</span>
 precmd() { yaad check }</pre>
       </div>
       <div class="reminder-card">
-        <span class="badge badge-cyan">Systemd</span>
+        <span class="label cyan" style="margin-bottom:.75rem">systemd</span>
         <h3>Background daemon</h3>
-        <p>Install yaad as a systemd user service. Sends desktop notifications via <code>notify-send</code> automatically.</p>
+        <p>Install as a systemd user service. Desktop notifications via <code>notify-send</code>.</p>
         <pre>yaad daemon install
 systemctl --user enable --now yaad
 
-<span style="color:var(--muted)"># check status</span>
+<span class="c"># check status</span>
 systemctl --user status yaad</pre>
       </div>
     </div>
 
-    <p style="margin-top:1.5rem;font-size:.875rem;color:var(--muted);">
+    <p style="margin-top:1.5rem;font-size:.82rem;color:var(--dim);">
       Learn more in the
       <a href="https://github.com/KunalSin9h/yaad?tab=readme-ov-file#reminders" target="_blank" rel="noopener">reminders documentation →</a>
     </p>
@@ -531,30 +836,31 @@ systemctl --user status yaad</pre>
 </section>
 
 <!-- ─── CTA ─── -->
-<section style="text-align:center; padding: 5rem 2rem;">
-  <div class="section-inner" style="max-width:580px">
-    <h2>Start remembering everything.</h2>
-    <p style="color:var(--muted);margin:1rem 0 2rem;font-size:1.05rem;">
-      One command. All local. Open source.
-    </p>
+<section id="cta">
+  <div class="cta-inner">
+    <span class="label purple" style="justify-content:center;margin-bottom:1.25rem">open source</span>
+    <h2>Start remembering<br />everything.</h2>
+    <p>One command. All local. MIT licensed.</p>
     <div class="hero-actions" style="justify-content:center">
-      <a href="#install" class="btn-primary">Install yaad</a>
+      <a href="#install" class="btn-primary">Install yaad →</a>
       <a href="https://github.com/KunalSin9h/yaad" class="btn-ghost" target="_blank" rel="noopener">Star on GitHub</a>
     </div>
-    <div style="margin-top:2.5rem;">
-      <pre style="display:inline-block;text-align:left;">go install github.com/kunalsin9h/yaad/cmd/yaad@latest</pre>
+    <div class="install-cmd">
+      <span class="dollar">$</span>
+      go install github.com/kunalsin9h/yaad/cmd/yaad@latest
     </div>
   </div>
 </section>
 
 <!-- ─── FOOTER ─── -->
 <footer>
-  <p>
-    <strong style="color:var(--text)">yaad</strong> &nbsp;·&nbsp;
-    MIT License &nbsp;·&nbsp;
-    <a href="https://github.com/KunalSin9h/yaad" target="_blank" rel="noopener">GitHub</a> &nbsp;·&nbsp;
-    Built by <a href="https://github.com/KunalSin9h" target="_blank" rel="noopener">Kunal Singh</a>
-  </p>
+  <span>yaad</span>
+  <span class="sep">·</span>
+  <span>MIT License</span>
+  <span class="sep">·</span>
+  <a href="https://github.com/KunalSin9h/yaad" target="_blank" rel="noopener">GitHub</a>
+  <span class="sep">·</span>
+  <span>Built by <a href="https://github.com/KunalSin9h" target="_blank" rel="noopener">Kunal Singh</a></span>
 </footer>
 
 </body>

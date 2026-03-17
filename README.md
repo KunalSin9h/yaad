@@ -1,13 +1,13 @@
 ## yaad
 
-> An AI-native terminal memory and reminder system, powered by Ollama.
+> AI-native memory, recall and reminder on the terminal — locally with Ollama.
 
 Save anything from your terminal — commands, notes, URLs, facts, reminders — and recall it later with natural language. Everything runs locally. No cloud, no accounts.
 
 ```bash
-# Save a command with context
+# Save a anything with context
 yaad add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
-  --for "yaad CLI build session"
+  --for "yaad CLI build session" # --for is optional
 
 # Set a time-based reminder
 yaad add "book conference ticket" --remind "in 30 minutes"
