@@ -1,0 +1,59 @@
+version: 2
+
+project_name: yaad
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: yaad
+    main: ./cmd/yaad
+    binary: yaad
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+
+archives:
+  - id: yaad
+    builds: [yaad]
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+      - LICENSE
+      - CONFIG.md
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+      - Merge pull request
+      - Merge branch
+
+release:
+  github:
+    owner: KunalSin9h
+    name: yaad
+  draft: false
+  prerelease: auto
+  name_template: "v{{ .Version }}"

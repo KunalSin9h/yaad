@@ -1,7 +1,8 @@
 ## yaad
 
 > AI-native memory, recall and reminder on the terminal — locally with Ollama.
-> [yaad website](https://yaad.knl.co.in/)**
+
+> [yaad website](https://yaad.knl.co.in/)
 
 Save anything from your terminal — commands, notes, URLs, facts, reminders — and recall it later with natural language. Everything runs locally. No cloud, no accounts.
 
@@ -63,11 +64,21 @@ ollama pull llama3.2:3b        # reasoning (or any chat model you prefer)
 
 ## Installation
 
+**Linux / macOS** — one-liner (detects platform and arch automatically):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/KunalSin9h/yaad/main/scripts/install.sh | bash
+```
+
+**Go install:**
+
 ```bash
 go install github.com/kunalsin9h/yaad/cmd/yaad@latest
 ```
 
-Or build from source:
+**Pre-built binaries** — download from [GitHub Releases](https://github.com/KunalSin9h/yaad/releases).
+
+**Build from source:**
 
 ```bash
 git clone https://github.com/kunalsin9h/yaad
