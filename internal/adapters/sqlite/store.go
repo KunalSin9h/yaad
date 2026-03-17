@@ -11,8 +11,8 @@ import (
 	"sort"
 	"time"
 
-	"github.com/kunalsin9h/lore/internal/domain"
-	"github.com/kunalsin9h/lore/internal/ports"
+	"github.com/kunalsin9h/yaad/internal/domain"
+	"github.com/kunalsin9h/yaad/internal/ports"
 )
 
 // Compile-time interface check.
@@ -54,7 +54,7 @@ func (s *Store) Save(ctx context.Context, m *domain.Memory) error {
 
 func (s *Store) GetByID(ctx context.Context, id string) (*domain.Memory, error) {
 	// ULIDs are 26 chars. Accept a prefix (e.g. the 10-char short ID shown
-	// by `lore add`) and match the first row whose ID starts with it.
+	// by `yaad add`) and match the first row whose ID starts with it.
 	col := "id = ?"
 	arg := id
 	if len(id) < 26 {

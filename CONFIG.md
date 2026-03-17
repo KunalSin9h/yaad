@@ -1,17 +1,17 @@
 # Configuration
 
-Configuration is read from `~/.lorerc` (key = value format). Create it with commented defaults:
+Configuration is read from `~/.yaadrc` (key = value format). Create it with commented defaults:
 
 ```bash
-lore config init
+yaad config init
 ```
 
 ---
 
-## Config file (`~/.lorerc`)
+## Config file (`~/.yaadrc`)
 
 ```ini
-# lore configuration
+# yaad configuration
 
 # Ollama server
 ollama.url           = http://localhost:11434
@@ -48,15 +48,15 @@ notifier = cli
 ## Priority
 
 ```
-built-in defaults  <  ~/.lorerc  <  CLI flags
+built-in defaults  <  ~/.yaadrc  <  CLI flags
 ```
 
 CLI flags override the rc file for a single invocation:
 
 ```bash
-lore --chat-model mistral ask "what was that command?"
-lore --ollama-url http://192.168.1.5:11434 add "remote ollama note"
-lore --notifier cli,notify-send check
+yaad --chat-model mistral ask "what was that command?"
+yaad --ollama-url http://192.168.1.5:11434 add "remote ollama note"
+yaad --notifier cli,notify-send check
 ```
 
 ---
@@ -64,18 +64,18 @@ lore --notifier cli,notify-send check
 ## Config commands
 
 ```bash
-lore config init                            # create ~/.lorerc with defaults
-lore config list                            # show all set values
-lore config set ollama.chat_model mistral   # update a value
-lore config get ollama.chat_model           # read a value
-lore config path                            # print rc file location
+yaad config init                            # create ~/.yaadrc with defaults
+yaad config list                            # show all set values
+yaad config set ollama.chat_model mistral   # update a value
+yaad config get ollama.chat_model           # read a value
+yaad config path                            # print rc file location
 ```
 
 ---
 
 ## Data storage
 
-Memories are stored at `$XDG_DATA_HOME/lore/memories.db`, defaulting to `~/.local/share/lore/memories.db`.
+Memories are stored at `$XDG_DATA_HOME/yaad/memories.db`, defaulting to `~/.local/share/yaad/memories.db`.
 
 ---
 
@@ -84,7 +84,7 @@ Memories are stored at `$XDG_DATA_HOME/lore/memories.db`, defaulting to `~/.loca
 Notifiers are composable — set multiple to fire all at once:
 
 ```bash
-lore config set notifier cli,notify-send
+yaad config set notifier cli,notify-send
 ```
 
 | Adapter | Platform | Requirement |

@@ -1,13 +1,13 @@
-BINARY    := lore
+BINARY    := yaad
 BUILD_DIR := bin
 
 .PHONY: build install test clean
 
 build:
-	go build -o $(BUILD_DIR)/$(BINARY) ./cmd/lore
+	go build -o $(BUILD_DIR)/$(BINARY) ./cmd/yaad
 
 install:
-	go install ./cmd/lore
+	go install ./cmd/yaad
 
 test:
 	go test ./...

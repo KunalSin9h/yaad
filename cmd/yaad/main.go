@@ -11,14 +11,14 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/kunalsin9h/lore/internal/adapters/notifier"
-	"github.com/kunalsin9h/lore/internal/adapters/ollama"
-	"github.com/kunalsin9h/lore/internal/adapters/rcfile"
-	sqliteadapter "github.com/kunalsin9h/lore/internal/adapters/sqlite"
-	"github.com/kunalsin9h/lore/internal/adapters/timeparser"
-	"github.com/kunalsin9h/lore/internal/app"
-	"github.com/kunalsin9h/lore/internal/domain"
-	"github.com/kunalsin9h/lore/internal/ports"
+	"github.com/kunalsin9h/yaad/internal/adapters/notifier"
+	"github.com/kunalsin9h/yaad/internal/adapters/ollama"
+	"github.com/kunalsin9h/yaad/internal/adapters/rcfile"
+	sqliteadapter "github.com/kunalsin9h/yaad/internal/adapters/sqlite"
+	"github.com/kunalsin9h/yaad/internal/adapters/timeparser"
+	"github.com/kunalsin9h/yaad/internal/app"
+	"github.com/kunalsin9h/yaad/internal/domain"
+	"github.com/kunalsin9h/yaad/internal/ports"
 	"github.com/spf13/cobra"
 )
 
@@ -35,7 +35,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	rcPath := filepath.Join(home, ".lorerc")
+	rcPath := filepath.Join(home, ".yaadrc")
 	dataDir, err := dataDirectory()
 	if err != nil {
 		return err
@@ -54,18 +54,18 @@ func run() error {
 	)
 
 	root := &cobra.Command{
-		Use:   "lore",
+		Use:   "yaad",
 		Short: "AI-native terminal memory and reminder system",
-		Long: `lore — save anything from your terminal, recall it with natural language.
+		Long: `yaad — save anything from your terminal, recall it with natural language.
 
 Examples:
-  lore add "claude --resume abc123" --for "lore build session"
-  lore add "book conference ticket" --remind "in 30 minutes"
-  lore ask "which claude session was I building lore in?"
-  lore list`,
+  yaad add "claude --resume abc123" --for "yaad build session"
+  yaad add "book conference ticket" --remind "in 30 minutes"
+  yaad ask "which claude session was I building yaad in?"
+  yaad list`,
 
 		// Build all services here — flags have been parsed, rc file is loaded.
-		// Config priority: built-in defaults < ~/.lorerc < CLI flags.
+		// Config priority: built-in defaults < ~/.yaadrc < CLI flags.
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			// Skip for config and help commands — they don't need AI or DB.
 			if cmd.Name() == "init" || cmd.Name() == "help" || cmd.Name() == "completion" {
@@ -311,10 +311,10 @@ func checkCmd(svc **app.ReminderService) *cobra.Command {
 		Long: `Designed to run on every shell prompt via PROMPT_COMMAND:
 
   Add to ~/.bashrc or ~/.zshrc:
-    export PROMPT_COMMAND="lore check; $PROMPT_COMMAND"
+    export PROMPT_COMMAND="yaad check; $PROMPT_COMMAND"
 
   For zsh, add to ~/.zshrc:
-    precmd() { lore check }`,
+    precmd() { yaad check }`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return (*svc).CheckAndFire(context.Background())
 		},
@@ -364,7 +364,7 @@ func daemonCmd(svc **app.ReminderService, rc ports.ConfigPort) *cobra.Command {
 func configCmd(rc *rcfile.Config, rcPath string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
-		Short: "Manage lore configuration (~/.lorerc)",
+		Short: "Manage yaad configuration (~/.yaadrc)",
 		// Config subcommands do not need the DB or AI client.
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error { return nil },
 	}
@@ -372,19 +372,19 @@ func configCmd(rc *rcfile.Config, rcPath string) *cobra.Command {
 	cmd.AddCommand(
 		&cobra.Command{
 			Use:   "init",
-			Short: "Create ~/.lorerc with commented defaults",
+			Short: "Create ~/.yaadrc with commented defaults",
 			RunE: func(cmd *cobra.Command, args []string) error {
 				if err := rc.Init(); err != nil {
 					return err
 				}
 				fmt.Printf("created %s\n", rcPath)
-				fmt.Println("edit it with your preferred text editor to configure lore.")
+				fmt.Println("edit it with your preferred text editor to configure yaad.")
 				return nil
 			},
 		},
 		&cobra.Command{
 			Use:   "set <key> <value>",
-			Short: "Set a config value in ~/.lorerc",
+			Short: "Set a config value in ~/.yaadrc",
 			Args:  cobra.ExactArgs(2),
 			RunE: func(cmd *cobra.Command, args []string) error {
 				if err := rc.Set(args[0], args[1]); err != nil {
@@ -413,7 +413,7 @@ func configCmd(rc *rcfile.Config, rcPath string) *cobra.Command {
 		},
 		&cobra.Command{
 			Use:   "list",
-			Short: "List all values in ~/.lorerc",
+			Short: "List all values in ~/.yaadrc",
 			RunE: func(cmd *cobra.Command, args []string) error {
 				all, err := rc.All()
 				if err != nil {
@@ -421,7 +421,7 @@ func configCmd(rc *rcfile.Config, rcPath string) *cobra.Command {
 				}
 				if len(all) == 0 {
 					fmt.Printf("no config set in %s — all defaults in use.\n", rcPath)
-					fmt.Println("run: lore config init   to create a config file")
+					fmt.Println("run: yaad config init   to create a config file")
 					return nil
 				}
 				w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
@@ -555,7 +555,7 @@ func dataDirectory() (string, error) {
 		}
 		base = filepath.Join(home, ".local", "share")
 	}
-	dir := filepath.Join(base, "lore")
+	dir := filepath.Join(base, "yaad")
 	return dir, os.MkdirAll(dir, 0o700)
 }
 
@@ -565,7 +565,7 @@ func installSystemdService() error {
 		return err
 	}
 	service := fmt.Sprintf(`[Unit]
-Description=lore reminder daemon
+Description=yaad reminder daemon
 After=graphical-session.target
 
 [Service]
@@ -581,11 +581,11 @@ WantedBy=default.target
 	if err := os.MkdirAll(svcDir, 0o755); err != nil {
 		return err
 	}
-	svcPath := filepath.Join(svcDir, "lore.service")
+	svcPath := filepath.Join(svcDir, "yaad.service")
 	if err := os.WriteFile(svcPath, []byte(service), 0o644); err != nil {
 		return err
 	}
 	fmt.Printf("installed: %s\n", svcPath)
-	fmt.Println("enable  : systemctl --user enable --now lore")
+	fmt.Println("enable  : systemctl --user enable --now yaad")
 	return nil
 }

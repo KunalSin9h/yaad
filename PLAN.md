@@ -1,4 +1,4 @@
-# lore — Implementation Plan
+# yaad — Implementation Plan
 
 Track progress here. Check off items as they are completed.
 
@@ -6,7 +6,7 @@ Track progress here. Check off items as they are completed.
 
 ## Phase 1 — Project Scaffold
 
-- [x] `go mod init github.com/kunalsingh/lore`
+- [x] `go mod init github.com/kunalsingh/yaad`
 - [x] Create full directory structure (`cmd`, `internal/domain`, `internal/ports`, `internal/app`, `internal/adapters`)
 - [x] Add core dependencies to `go.mod`:
   - [x] `github.com/spf13/cobra` — CLI
@@ -14,7 +14,7 @@ Track progress here. Check off items as they are completed.
   - [x] `github.com/olebedev/when` — natural language time parsing (used directly via HTTP, no Ollama SDK needed)
   - [x] `github.com/oklog/ulid/v2` — sortable unique IDs
   - [x] `golang.org/x/sync` — errgroup for parallel AI calls
-- [x] `cmd/lore/main.go` — entry point, root cobra command, wire dependencies
+- [x] `cmd/yaad/main.go` — entry point, root cobra command, wire dependencies
 
 ---
 
@@ -110,28 +110,28 @@ Track progress here. Check off items as they are completed.
 
 ## Phase 9 — CLI Commands (Cobra)
 
-- [x] `lore add` command
+- [x] `yaad add` command
   - [x] Flags: `--for`, `--remind`, `--type`, `--tag`
   - [x] Call `MemoryService.Add()`
   - [x] Print confirmation with ID, type, tags, remind_at
-- [x] `lore ask` command
+- [x] `yaad ask` command
   - [x] Accept question as positional arg
   - [x] Print LLM answer
-- [x] `lore list` command
+- [x] `yaad list` command
   - [x] Flags: `--type`, `--tag`, `--limit`, `--remind`
   - [x] Render table: ID (short), type, content (truncated), for_label, created_at (relative)
-- [x] `lore get` command
+- [x] `yaad get` command
   - [x] By full ID
   - [x] Print full memory details
-- [x] `lore delete` command
+- [x] `yaad delete` command
   - [x] Confirm prompt before deleting (`--force` to skip)
-- [x] `lore check` command
+- [x] `yaad check` command
   - [x] Silent unless reminders are due
   - [x] Designed for `PROMPT_COMMAND` integration
-- [x] `lore daemon` command
+- [x] `yaad daemon` command
   - [x] `start` — run poll loop in foreground (systemd manages background)
   - [x] `install` — write systemd user service file
-- [x] `lore config` command
+- [x] `yaad config` command
   - [x] `set <key> <value>`
   - [x] `get <key>`
   - [x] `list`
@@ -140,7 +140,7 @@ Track progress here. Check off items as they are completed.
 
 ## Phase 10 — Wiring (Dependency Injection)
 
-- [x] `cmd/lore/main.go`
+- [x] `cmd/yaad/main.go`
   - [x] Determine DB path (XDG_DATA_HOME aware)
   - [x] Instantiate SQLiteAdapter (shared DB for Store + Config)
   - [x] Instantiate OllamaAdapter (direct HTTP, no SDK dependency)
@@ -157,7 +157,7 @@ Track progress here. Check off items as they are completed.
 - [ ] Unit tests for `ReminderService.CheckAndFire()` with mock adapters
 - [ ] Integration test: SQLite adapter round-trip (save → list → delete)
 - [ ] Integration test: Ollama embed + FindSimilar
-- [ ] `lore check` shell integration docs in README
+- [ ] `yaad check` shell integration docs in README
 - [x] Graceful handling: Ollama not running → skip embed, save with empty embedding, warn user
 - [x] `--help` text for all commands reviewed and accurate
 
@@ -166,8 +166,8 @@ Track progress here. Check off items as they are completed.
 ## Phase 12 — Distribution
 
 - [x] `Makefile` with `build`, `install`, `test` targets
-- [ ] `go install github.com/kunalsingh/lore/cmd/rememberit@latest` works
-- [ ] Systemd service template at `contrib/lore.service`
+- [ ] `go install github.com/kunalsingh/yaad/cmd/rememberit@latest` works
+- [ ] Systemd service template at `contrib/yaad.service`
 
 ---
 

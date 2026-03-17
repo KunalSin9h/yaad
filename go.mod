@@ -1,4 +1,4 @@
-module github.com/kunalsin9h/lore
+module github.com/kunalsin9h/yaad
 
 go 1.26
 

@@ -1,4 +1,4 @@
-// Package rcfile implements ConfigPort backed by a ~/.lorerc file.
+// Package rcfile implements ConfigPort backed by a ~/.yaadrc file.
 // Format: one "key = value" pair per line; lines starting with # are comments.
 // Set() does an in-place update — it rewrites the matching line, or appends
 // a new one if the key is not present yet. Comments and blank lines are
@@ -11,12 +11,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/kunalsin9h/lore/internal/ports"
+	"github.com/kunalsin9h/yaad/internal/ports"
 )
 
 // DefaultConfig is written by Init() when no rc file exists yet.
-const DefaultConfig = `# lore configuration
-# Reference: https://github.com/KunalSin9h/lore
+const DefaultConfig = `# yaad configuration
+# Reference: https://github.com/KunalSin9h/yaad
 #
 # Flag equivalents override these values per-invocation:
 #   --ollama-url   --chat-model   --embed-model

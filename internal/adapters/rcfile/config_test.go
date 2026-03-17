@@ -6,14 +6,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kunalsin9h/lore/internal/adapters/rcfile"
+	"github.com/kunalsin9h/yaad/internal/adapters/rcfile"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func newTempConfig(t *testing.T, content string) *rcfile.Config {
 	t.Helper()
-	path := filepath.Join(t.TempDir(), ".lorerc")
+	path := filepath.Join(t.TempDir(), ".yaadrc")
 	if content != "" {
 		require.NoError(t, os.WriteFile(path, []byte(content), 0o644))
 	}
@@ -94,7 +94,7 @@ func TestSet_PreservesComments(t *testing.T) {
 }
 
 func TestSet_CreatesFile_WhenMissing(t *testing.T) {
-	cfg := rcfile.New(filepath.Join(t.TempDir(), ".lorerc"))
+	cfg := rcfile.New(filepath.Join(t.TempDir(), ".yaadrc"))
 	require.NoError(t, cfg.Set("ollama.url", "http://localhost:11434"))
 
 	v, err := cfg.Get("ollama.url")
@@ -124,7 +124,7 @@ func TestAll_MissingFile_ReturnsEmpty(t *testing.T) {
 // --- Init ---
 
 func TestInit_CreatesFileWithDefaults(t *testing.T) {
-	cfg := rcfile.New(filepath.Join(t.TempDir(), ".lorerc"))
+	cfg := rcfile.New(filepath.Join(t.TempDir(), ".yaadrc"))
 	require.NoError(t, cfg.Init())
 
 	raw, err := os.ReadFile(cfg.Path)

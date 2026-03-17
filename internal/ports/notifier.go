@@ -3,7 +3,7 @@ package ports
 import (
 	"context"
 
-	"github.com/kunalsin9h/lore/internal/domain"
+	"github.com/kunalsin9h/yaad/internal/domain"
 )
 
 // NotifierPort delivers reminder alerts to the user.

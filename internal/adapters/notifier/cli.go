@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kunalsin9h/lore/internal/domain"
-	"github.com/kunalsin9h/lore/internal/ports"
+	"github.com/kunalsin9h/yaad/internal/domain"
+	"github.com/kunalsin9h/yaad/internal/ports"
 )
 
 // Compile-time interface check.
@@ -36,7 +36,7 @@ func (c *CLI) Notify(_ context.Context, m *domain.Memory) error {
 	}
 
 	// Compute box width from visible (non-ANSI) content.
-	width := len("lore · reminder") // minimum based on header
+	width := len("yaad · reminder") // minimum based on header
 	for _, l := range lines {
 		if vl := visibleLen(l); vl > width {
 			width = vl
@@ -47,7 +47,7 @@ func (c *CLI) Notify(_ context.Context, m *domain.Memory) error {
 	bar := strings.Repeat("─", width+2)
 	fmt.Println()
 	fmt.Print(ansiYellow + "  ┌" + bar + "┐" + ansiReset + "\n")
-	fmt.Printf("%s  │ %s%s%-*s%s%s │%s\n", ansiYellow, ansiReset, ansiBold, width, "lore · reminder", ansiReset, ansiYellow, ansiReset)
+	fmt.Printf("%s  │ %s%s%-*s%s%s │%s\n", ansiYellow, ansiReset, ansiBold, width, "yaad · reminder", ansiReset, ansiYellow, ansiReset)
 	fmt.Printf("%s  │ %s%-*s%s │%s\n", ansiYellow, ansiReset, width, "", ansiYellow, ansiReset)
 	for _, l := range lines {
 		pad := width - visibleLen(l)

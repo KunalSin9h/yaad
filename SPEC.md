@@ -1,8 +1,8 @@
-# lore — Product Specification
+# yaad — Product Specification
 
 ## Overview
 
-`lore` is a terminal-native, AI-powered memory and reminder CLI. It lets you save any piece of information — commands, notes, URLs, facts, reminders — with rich metadata, then retrieve it later through natural language queries. The AI layer runs entirely locally via Ollama, keeping all data private and offline-capable.
+`yaad` is a terminal-native, AI-powered memory and reminder CLI. It lets you save any piece of information — commands, notes, URLs, facts, reminders — with rich metadata, then retrieve it later through natural language queries. The AI layer runs entirely locally via Ollama, keeping all data private and offline-capable.
 
 It is **not** a calendar replacement. It is a queryable, intelligent scratchpad that lives in your terminal.
 
@@ -46,10 +46,10 @@ Type is auto-detected by the AI on `add`. User can override with `--type`.
 
 ## CLI Interface
 
-### `lore add`
+### `yaad add`
 
 ```bash
-lore add "<content>" [flags]
+yaad add "<content>" [flags]
 
 Flags:
   --for, -f   string   Human context / purpose label
@@ -60,35 +60,35 @@ Flags:
 
 Examples:
 ```bash
-lore add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
+yaad add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
   --for "rememberit CLI build session"
 
-lore add "book conference ticket" \
+yaad add "book conference ticket" \
   --remind "in 30 minutes"
 
-lore add "postgres password is hunter2" \
+yaad add "postgres password is hunter2" \
   --for "staging env" --tag secrets
 ```
 
-### `lore ask`
+### `yaad ask`
 
 Natural language query. AI finds relevant memories and synthesizes an answer.
 
 ```bash
-lore ask "<question>"
+yaad ask "<question>"
 ```
 
 Examples:
 ```bash
-lore ask "which claude session was I building rememberit in?"
-lore ask "what do I need to do tonight?"
-lore ask "what was that postgres port number?"
+yaad ask "which claude session was I building rememberit in?"
+yaad ask "what do I need to do tonight?"
+yaad ask "what was that postgres port number?"
 ```
 
-### `lore list`
+### `yaad list`
 
 ```bash
-lore list [flags]
+yaad list [flags]
 
 Flags:
   --type    string   Filter by memory type
@@ -97,53 +97,53 @@ Flags:
   --remind         Show only pending reminders
 ```
 
-### `lore get`
+### `yaad get`
 
 Retrieve a single memory by ID or fuzzy content match.
 
 ```bash
-lore get <id>
-lore get --like "claude resume"
+yaad get <id>
+yaad get --like "claude resume"
 ```
 
-### `lore delete`
+### `yaad delete`
 
 ```bash
-lore delete <id>
+yaad delete <id>
 ```
 
-### `lore daemon`
+### `yaad daemon`
 
 Background process that fires reminder notifications.
 
 ```bash
-lore daemon start    # start in background
-lore daemon stop
-lore daemon status
-lore daemon install  # install as systemd user service
+yaad daemon start    # start in background
+yaad daemon stop
+yaad daemon status
+yaad daemon install  # install as systemd user service
 ```
 
-### `lore check`
+### `yaad check`
 
 Designed to be called from shell `PROMPT_COMMAND`. Silently checks for due reminders and prints inline if any are found. Zero-latency alternative to daemon.
 
 ```bash
-lore check           # prints nothing if no reminders due
+yaad check           # prints nothing if no reminders due
 ```
 
 Shell integration (add to `.bashrc` / `.zshrc`):
 ```bash
-PROMPT_COMMAND="lore check; $PROMPT_COMMAND"
+PROMPT_COMMAND="yaad check; $PROMPT_COMMAND"
 ```
 
-### `lore config`
+### `yaad config`
 
 ```bash
-lore config set ollama.url http://localhost:11434
-lore config set ollama.embed_model nomic-embed-text
-lore config set ollama.chat_model llama3.2:3b
-lore config get ollama.url
-lore config list
+yaad config set ollama.url http://localhost:11434
+yaad config set ollama.embed_model nomic-embed-text
+yaad config set ollama.chat_model llama3.2:3b
+yaad config get ollama.url
+yaad config list
 ```
 
 ---
@@ -310,8 +310,8 @@ CREATE INDEX idx_memories_created_at ON memories(created_at DESC);
 
 ## Configuration
 
-Stored at `~/.config/lore/config.db` (same SQLite file).
-Data stored at `~/.local/share/lore/memories.db`.
+Stored at `~/.config/yaad/config.db` (same SQLite file).
+Data stored at `~/.local/share/yaad/memories.db`.
 
 | Key | Default |
 |---|---|

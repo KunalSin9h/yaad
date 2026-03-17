@@ -1,4 +1,4 @@
-## lore
+## yaad
 
 > An AI-native terminal memory and reminder system, powered by Ollama.
 
@@ -6,15 +6,15 @@ Save anything from your terminal — commands, notes, URLs, facts, reminders —
 
 ```bash
 # Save a command with context
-lore add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
-  --for "lore CLI build session"
+yaad add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
+  --for "yaad CLI build session"
 
 # Set a time-based reminder
-lore add "book conference ticket" --remind "in 30 minutes"
+yaad add "book conference ticket" --remind "in 30 minutes"
 
 # Ask anything
-lore ask "which claude session was I building lore in?"
-lore ask "do I have anything due tonight?"
+yaad ask "which claude session was I building yaad in?"
+yaad ask "do I have anything due tonight?"
 ```
 
 ---
@@ -63,14 +63,14 @@ ollama pull llama3.2:3b        # reasoning (or any chat model you prefer)
 ## Installation
 
 ```bash
-go install github.com/kunalsin9h/lore/cmd/lore@latest
+go install github.com/kunalsin9h/yaad/cmd/yaad@latest
 ```
 
 Or build from source:
 
 ```bash
-git clone https://github.com/kunalsin9h/lore
-cd lore
+git clone https://github.com/kunalsin9h/yaad
+cd yaad
 make install
 ```
 
@@ -78,17 +78,17 @@ make install
 
 ## Configuration
 
-Configuration is read from `~/.lorerc`. Generate it with commented defaults:
+Configuration is read from `~/.yaadrc`. Generate it with commented defaults:
 
 ```bash
-lore config init
+yaad config init
 ```
 
 Common commands:
 
 ```bash
-lore config set ollama.chat_model mistral
-lore config list
+yaad config set ollama.chat_model mistral
+yaad config list
 ```
 
 See [CONFIG.md](./CONFIG.md) for all keys, notifier options, CLI flag overrides, and data storage location.
@@ -100,7 +100,7 @@ See [CONFIG.md](./CONFIG.md) for all keys, notifier options, CLI flag overrides,
 ### Save a memory
 
 ```bash
-lore add "<content>" [flags]
+yaad add "<content>" [flags]
 
 Flags:
   -f, --for     string   Why are you saving this? (context label)
@@ -113,43 +113,43 @@ Examples:
 
 ```bash
 # A command you want to resume later
-lore add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
-  --for "lore build session"
+yaad add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
+  --for "yaad build session"
 
 # A time-sensitive reminder
-lore add "book conference ticket" --remind "in 30 minutes"
+yaad add "book conference ticket" --remind "in 30 minutes"
 
 # A fact with tags
-lore add "staging postgres is on port 5433" \
+yaad add "staging postgres is on port 5433" \
   --for "backend infra" --tag postgres --tag staging
 
 # A URL
-lore add "https://pkg.go.dev/modernc.org/sqlite" \
+yaad add "https://pkg.go.dev/modernc.org/sqlite" \
   --for "pure Go SQLite driver, no CGO"
 ```
 
 ### Query your memories
 
 ```bash
-lore ask "which claude session was for building lore?"
-lore ask "what was the staging postgres port?"
-lore ask "do I have anything due tonight?"
+yaad ask "which claude session was for building yaad?"
+yaad ask "what was the staging postgres port?"
+yaad ask "do I have anything due tonight?"
 ```
 
 ### Browse memories
 
 ```bash
-lore list                   # 20 most recent
-lore list --type command    # only commands
-lore list --tag postgres    # by tag
-lore list --remind          # pending reminders only
-lore list --limit 50
+yaad list                   # 20 most recent
+yaad list --type command    # only commands
+yaad list --tag postgres    # by tag
+yaad list --remind          # pending reminders only
+yaad list --limit 50
 ```
 
 ### Get full details
 
 ```bash
-lore get 01KKXKKJ3Q         # by ID (prefix is fine)
+yaad get 01KKXKKJ3Q         # by ID (prefix is fine)
 ```
 
 Output includes content, context label, type, tags, working directory, hostname, and timestamps.
@@ -157,8 +157,8 @@ Output includes content, context label, type, tags, working directory, hostname,
 ### Delete
 
 ```bash
-lore delete 01KKXKKJ3Q      # prompts for confirmation
-lore delete 01KKXKKJ3Q -y   # skip confirmation
+yaad delete 01KKXKKJ3Q      # prompts for confirmation
+yaad delete 01KKXKKJ3Q -y   # skip confirmation
 ```
 
 ---
@@ -172,33 +172,33 @@ Reminders surface directly in your terminal on every prompt — no background pr
 Add to your `~/.bashrc` or `~/.zshrc`:
 
 ```bash
-export PROMPT_COMMAND="lore check; $PROMPT_COMMAND"
+export PROMPT_COMMAND="yaad check; $PROMPT_COMMAND"
 ```
 
 For `zsh`, add to `~/.zshrc`:
 
 ```zsh
-precmd() { lore check }
+precmd() { yaad check }
 ```
 
 ### Background daemon — systemd user service
 
 ```bash
-lore daemon install          # writes ~/.config/systemd/user/lore.service
-systemctl --user enable --now lore
+yaad daemon install          # writes ~/.config/systemd/user/yaad.service
+systemctl --user enable --now yaad
 ```
 
 Check status:
 
 ```bash
-systemctl --user status lore
+systemctl --user status yaad
 ```
 
 ---
 
 ## Architecture
 
-`lore` follows the **Ports and Adapters** (Hexagonal) pattern. The domain and application logic are fully isolated from infrastructure — every adapter is replaceable without touching business logic.
+`yaad` follows the **Ports and Adapters** (Hexagonal) pattern. The domain and application logic are fully isolated from infrastructure — every adapter is replaceable without touching business logic.
 
 ```
 CLI (Cobra)
@@ -222,8 +222,8 @@ Swapping any layer requires implementing one interface. For example, to use Chro
 ## Project structure
 
 ```
-lore/
-├── cmd/lore/main.go          # entry point + dependency wiring
+yaad/
+├── cmd/yaad/main.go          # entry point + dependency wiring
 ├── internal/
 │   ├── domain/                     # Memory, MemoryType, errors — no deps
 │   ├── ports/                      # interfaces only — no deps

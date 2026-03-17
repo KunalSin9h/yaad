@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	sqliteadapter "github.com/kunalsin9h/lore/internal/adapters/sqlite"
-	"github.com/kunalsin9h/lore/internal/app"
-	"github.com/kunalsin9h/lore/internal/domain"
-	"github.com/kunalsin9h/lore/internal/testutil"
+	sqliteadapter "github.com/kunalsin9h/yaad/internal/adapters/sqlite"
+	"github.com/kunalsin9h/yaad/internal/app"
+	"github.com/kunalsin9h/yaad/internal/domain"
+	"github.com/kunalsin9h/yaad/internal/testutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -31,12 +31,12 @@ func TestMemoryService_Add_StoresContent(t *testing.T) {
 
 	m, err := svc.Add(context.Background(), app.AddRequest{
 		Content:  "claude --resume abc123",
-		ForLabel: "lore build session",
+		ForLabel: "yaad build session",
 	})
 	require.NoError(t, err)
 	assert.NotEmpty(t, m.ID)
 	assert.Equal(t, "claude --resume abc123", m.Content)
-	assert.Equal(t, "lore build session", m.ForLabel)
+	assert.Equal(t, "yaad build session", m.ForLabel)
 
 	// Verify it was persisted.
 	got, err := db.Store.GetByID(context.Background(), m.ID)

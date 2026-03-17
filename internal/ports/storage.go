@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/kunalsin9h/lore/internal/domain"
+	"github.com/kunalsin9h/yaad/internal/domain"
 )
 
 // StoragePort defines all persistence operations.

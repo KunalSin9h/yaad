@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	sqliteadapter "github.com/kunalsin9h/lore/internal/adapters/sqlite"
-	"github.com/kunalsin9h/lore/internal/domain"
+	sqliteadapter "github.com/kunalsin9h/yaad/internal/adapters/sqlite"
+	"github.com/kunalsin9h/yaad/internal/domain"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

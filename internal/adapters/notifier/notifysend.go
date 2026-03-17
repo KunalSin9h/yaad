@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os/exec"
 
-	"github.com/kunalsin9h/lore/internal/domain"
-	"github.com/kunalsin9h/lore/internal/ports"
+	"github.com/kunalsin9h/yaad/internal/domain"
+	"github.com/kunalsin9h/yaad/internal/ports"
 )
 
 // Compile-time interface check.
@@ -29,7 +29,7 @@ func IsAvailable() bool {
 }
 
 func (n *NotifySend) Notify(ctx context.Context, m *domain.Memory) error {
-	title := fmt.Sprintf("lore [%s]", m.Type)
+	title := fmt.Sprintf("yaad [%s]", m.Type)
 	body := m.Content
 	if m.ForLabel != "" {
 		body += "\n" + m.ForLabel
