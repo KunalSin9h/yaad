@@ -428,6 +428,43 @@
     .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; letter-spacing: -.01em; }
     .feature-card p  { font-size: .95rem; color: var(--muted); line-height: 1.75; }
 
+    /* ─── MODES ─── */
+    .modes-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 760px) { .modes-split { grid-template-columns: 1fr; } }
+    .mode-card {
+      border: 1px solid var(--border);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+    .mode-active { border-color: var(--border2); background: var(--bg2); }
+    .mode-soon   { background: var(--bg); }
+    .mode-header { display: flex; align-items: center; gap: .75rem; }
+    .mode-title  { font-size: 1rem; font-weight: 700; letter-spacing: -.01em; }
+    .mode-badge  {
+      font-family: "SF Mono", monospace;
+      font-size: .65rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .2rem .55rem;
+      border: 1px solid currentColor;
+    }
+    .badge-now  { color: var(--green); }
+    .badge-soon { color: var(--purple); opacity: .7; }
+    .mode-desc  { font-size: .92rem; color: var(--muted); line-height: 1.75; }
+    .mode-traits {
+      list-style: none;
+      display: flex; flex-direction: column; gap: .3rem;
+      font-size: .85rem; color: var(--muted);
+      font-family: "SF Mono", monospace;
+    }
+    .mode-traits li { display: flex; gap: .5rem; align-items: baseline; }
+
     /* ─── INSTALL ─── */
     #install { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     .install-steps { display: flex; flex-direction: column; gap: 2rem; }
@@ -584,9 +621,9 @@
   <div class="nav-logo mono">yaad<span class="tilde"> ~$</span></div>
   <div class="nav-links">
     <a href="#features">features</a>
+    <a href="#reminders">reminders</a>
     <a href="#install">install</a>
     <a href="#usage">usage</a>
-    <a href="#reminders">reminders</a>
   </div>
   <a href="https://github.com/KunalSin9h/yaad" class="nav-gh" target="_blank" rel="noopener">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
@@ -610,9 +647,9 @@
     100% local
   </div>
 
-  <h1>Your terminal,<br /><span class="hi">finally has memory</span>.</h1>
+  <h1>Memory,<br /><span class="hi">on the terminal</span>.</h1>
   <p class="hero-sub">
-    Save commands, notes, URLs, facts, and reminders right in the terminal.
+    Save commands, notes, URLs, facts, and reminders right from the terminal.
     Recall anything later with natural language. Fully local with Ollama.
   </p>
   <div class="hero-actions">
@@ -684,7 +721,7 @@
     <span class="marquee-item sep">·</span>
     <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"what's the staging db port?"</span></span>
     <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"https://docs.example.com/api"</span> <span class="flag">--tag</span> <span class="str">reference</span></span>
+    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"api reference: https://docs.example.com/api"</span></span>
     <span class="marquee-item sep">·</span>
     <span class="marquee-item"><span class="cmd">yaad list</span> <span class="flag">--remind</span></span>
     <span class="marquee-item sep">·</span>
@@ -699,7 +736,7 @@
     <span class="marquee-item sep">·</span>
     <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"what's the staging db port?"</span></span>
     <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"https://docs.example.com/api"</span> <span class="flag">--tag</span> <span class="str">reference</span></span>
+    <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"api reference: https://docs.example.com/api"</span></span>
     <span class="marquee-item sep">·</span>
     <span class="marquee-item"><span class="cmd">yaad list</span> <span class="flag">--remind</span></span>
     <span class="marquee-item sep">·</span>
@@ -798,6 +835,133 @@
   </div>
 </section>
 
+<!-- ─── REMINDERS ─── -->
+<section id="reminders" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="section-inner">
+    <span class="label rose">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"></circle><path d="M12 8v4l3 2"></path></svg>
+      reminders
+    </span>
+    <h2>Never miss a deadline.</h2>
+    <p class="section-lead">Set a reminder while saving — yaad surfaces it right in your terminal when it's due.</p>
+
+    <pre style="margin-bottom:2rem"><span class="c"># set a reminder while saving</span>
+yaad add <span class="s">"book conference ticket"</span> <span class="k">--remind</span> <span class="s">"in 30 minutes"</span>
+yaad add <span class="s">"deploy to prod"</span> <span class="k">--remind</span> <span class="s">"tomorrow 3pm"</span>
+yaad add <span class="s">"submit PR for review"</span> <span class="k">--remind</span> <span class="s">"Friday 9am"</span></pre>
+
+    <p class="section-lead" style="margin-bottom:1.5rem">Two ways to surface reminders — pick what fits your workflow.</p>
+
+    <div class="reminder-options">
+      <div class="reminder-card">
+        <span class="label green" style="margin-bottom:.75rem">recommended</span>
+        <h3>Inline — PROMPT_COMMAND</h3>
+        <p>Reminders surface in your terminal on every prompt. No background process needed.</p>
+        <pre><span class="c"># ~/.bashrc</span>
+export PROMPT_COMMAND=<span class="s">"yaad check; $PROMPT_COMMAND"</span>
+
+<span class="c"># ~/.zshrc</span>
+precmd() { yaad check }</pre>
+      </div>
+      <div class="reminder-card">
+        <span class="label cyan" style="margin-bottom:.75rem">systemd</span>
+        <h3>Background daemon</h3>
+        <p>Install as a systemd user service. Desktop notifications via <code>notify-send</code>.</p>
+        <pre>yaad daemon install
+systemctl --user enable --now yaad
+
+<span class="c"># check status</span>
+systemctl --user status yaad</pre>
+      </div>
+    </div>
+
+    <p style="margin-top:1.5rem;font-size:.82rem;color:var(--dim);">
+      Learn more in the
+      <a href="https://github.com/KunalSin9h/yaad?tab=readme-ov-file#reminders" target="_blank" rel="noopener">reminders documentation →</a>
+    </p>
+  </div>
+</section>
+
+<!-- ─── MODES ─── -->
+<section id="modes" style="border-top:1px solid var(--border);">
+  <div class="section-inner">
+    <span class="label purple">
+      <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
+      two modes
+    </span>
+    <h2>Memory on Terminal.<br /><span style="color:var(--muted);font-size:.75em;font-weight:600;letter-spacing:0">Terminal Memory, coming soon.</span></h2>
+    <p class="section-lead">yaad will support both. Here's what sets them apart.</p>
+
+    <div class="modes-split">
+
+      <!-- MODE 1: Memory on Terminal -->
+      <div class="mode-card mode-active">
+        <div class="mode-header">
+          <div class="mode-badge badge-now">● now</div>
+          <div class="mode-title">Memory on Terminal</div>
+        </div>
+        <p class="mode-desc">You decide what's worth saving. Write context right into the content — the AI embeds everything and surfaces it precisely when you ask.</p>
+        <div class="terminal" style="box-shadow:none;border-color:var(--border2);">
+          <div class="terminal-bar">
+            <div class="tb-dot tb-r"></div><div class="tb-dot tb-y"></div><div class="tb-dot tb-g"></div>
+            <span class="terminal-title">intentional — zsh</span>
+          </div>
+          <div class="terminal-body" style="font-size:.82rem;line-height:1.85;">
+            <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"prod login: ssh -i ~/.ssh/id_rsa user@prod"</span></div>
+            <div class="t-out">  saved &nbsp;[command]</div>
+            <span class="t-blank"></span>
+            <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"db migration session: claude --resume 3fa2c891"</span></div>
+            <div class="t-out">  saved &nbsp;[fact]</div>
+            <span class="t-blank"></span>
+            <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"how do I log into prod?"</span></div>
+            <div class="t-ans">  ssh -i ~/.ssh/id_rsa user@prod</div>
+          </div>
+        </div>
+        <ul class="mode-traits">
+          <li><span style="color:var(--green)">✓</span> You control the signal</li>
+          <li><span style="color:var(--green)">✓</span> Context in content = precise recall</li>
+          <li><span style="color:var(--green)">✓</span> Available today</li>
+        </ul>
+      </div>
+
+      <!-- MODE 2: Terminal Memory -->
+      <div class="mode-card mode-soon">
+        <div class="mode-header">
+          <div class="mode-badge badge-soon">◌ coming soon</div>
+          <div class="mode-title">Terminal Memory</div>
+        </div>
+        <p class="mode-desc">yaad watches your workflow silently. No new commands to learn. It captures what matters, builds memory in the background, and surfaces it when you need it.</p>
+        <div class="terminal" style="box-shadow:none;border-color:var(--border);opacity:.7;">
+          <div class="terminal-bar">
+            <div class="tb-dot tb-r"></div><div class="tb-dot tb-y"></div><div class="tb-dot tb-g"></div>
+            <span class="terminal-title">transparent — zsh</span>
+          </div>
+          <div class="terminal-body" style="font-size:.82rem;line-height:1.85;">
+            <div><span class="t-prompt">❯ </span><span class="t-cmd">ssh -i ~/.ssh/id_rsa user@prod</span></div>
+            <div class="t-out" style="color:var(--border2)">  <em>yaad noticed ·</em> saved [command]</div>
+            <span class="t-blank"></span>
+            <div><span class="t-prompt">❯ </span><span class="t-cmd">git push origin main</span></div>
+            <div class="t-out">  Everything up-to-date</div>
+            <span class="t-blank"></span>
+            <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"how do I log into prod?"</span></div>
+            <div class="t-ans">  ssh -i ~/.ssh/id_rsa user@prod</div>
+          </div>
+        </div>
+        <ul class="mode-traits" style="opacity:.6;">
+          <li><span style="color:var(--purple)">◌</span> Zero friction, no new commands</li>
+          <li><span style="color:var(--purple)">◌</span> Learns from what you actually do</li>
+          <li><span style="color:var(--purple)">◌</span> On the roadmap</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <p style="margin-top:2rem;font-size:.82rem;color:var(--dim);text-align:center;line-height:1.8;">
+      Both modes will coexist — intentional saves stay precise, ambient capture fills the gaps.
+    </p>
+  </div>
+</section>
+
 <!-- ─── INSTALL ─── -->
 <section id="install">
   <div class="section-inner">
@@ -863,11 +1027,11 @@
     <div class="commands-grid">
       <div class="cmd-card">
         <div class="cmd-name">yaad add</div>
-        <p>Save anything. <code>--for</code> adds a label, <code>--remind</code> sets a deadline, <code>--tag</code> for filtering later.</p>
-        <pre style="margin-top:.75rem;font-size:.75rem">yaad add <span class="s">"staging db port is 5433"</span>
-yaad add <span class="s">"submit PR"</span> <span class="k">--remind</span> <span class="s">"tomorrow 9am"</span>
-yaad add <span class="s">"https://api.docs.com"</span> <span class="k">--tag</span> reference
-yaad add <span class="s">"ssh -i ~/.ssh/id_rsa user@prod"</span> <span class="k">--for</span> <span class="s">"prod login"</span></pre>
+        <p>Save anything. Include context right in the content — AI finds it later. <code>--remind</code> sets a deadline, <code>--tag</code> for filtering.</p>
+        <pre style="margin-top:.75rem;font-size:.75rem">yaad add <span class="s">"backend infra: staging db port is 5433"</span>
+yaad add <span class="s">"submit PR for review"</span> <span class="k">--remind</span> <span class="s">"tomorrow 9am"</span>
+yaad add <span class="s">"prod login: ssh -i ~/.ssh/id_rsa user@prod"</span>
+yaad add <span class="s">"https://api.docs.com"</span> <span class="k">--tag</span> reference</pre>
       </div>
       <div class="cmd-card">
         <div class="cmd-name">yaad ask</div>
@@ -905,46 +1069,6 @@ yaad config list</pre>
       </div>
     </div>
 
-  </div>
-</section>
-
-<!-- ─── REMINDERS ─── -->
-<section id="reminders">
-  <div class="section-inner">
-    <span class="label rose">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"></circle><path d="M12 8v4l3 2"></path></svg>
-      reminders
-    </span>
-    <h2>Never miss a deadline.</h2>
-    <p class="section-lead">Two ways to surface reminders — pick what fits your workflow.</p>
-
-    <div class="reminder-options">
-      <div class="reminder-card">
-        <span class="label green" style="margin-bottom:.75rem">recommended</span>
-        <h3>Inline — PROMPT_COMMAND</h3>
-        <p>Reminders surface in your terminal on every prompt. No background process needed.</p>
-        <pre><span class="c"># ~/.bashrc</span>
-export PROMPT_COMMAND=<span class="s">"yaad check; $PROMPT_COMMAND"</span>
-
-<span class="c"># ~/.zshrc</span>
-precmd() { yaad check }</pre>
-      </div>
-      <div class="reminder-card">
-        <span class="label cyan" style="margin-bottom:.75rem">systemd</span>
-        <h3>Background daemon</h3>
-        <p>Install as a systemd user service. Desktop notifications via <code>notify-send</code>.</p>
-        <pre>yaad daemon install
-systemctl --user enable --now yaad
-
-<span class="c"># check status</span>
-systemctl --user status yaad</pre>
-      </div>
-    </div>
-
-    <p style="margin-top:1.5rem;font-size:.82rem;color:var(--dim);">
-      Learn more in the
-      <a href="https://github.com/KunalSin9h/yaad?tab=readme-ov-file#reminders" target="_blank" rel="noopener">reminders documentation →</a>
-    </p>
   </div>
 </section>
 

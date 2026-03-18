@@ -7,9 +7,8 @@
 Save anything from your terminal — commands, notes, URLs, facts, reminders — and recall it later with natural language. Everything runs locally. No cloud, no accounts.
 
 ```bash
-# Save a anything with context
-yaad add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
-  --for "yaad CLI build session" # --for is optional
+# Save anything
+yaad add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644"
 
 # Set a time-based reminder
 yaad add "book conference ticket" --remind "in 30 minutes"
@@ -39,7 +38,7 @@ yaad ask "do I have anything due tonight?"
 ## Features
 
 - **Query-first** — natural language search powered by local embeddings + LLM
-- **Rich metadata** — every memory captures `--for` context, working directory, hostname, and timestamp automatically
+- **Rich metadata** — every memory captures working directory, hostname, and timestamp automatically
 - **Smart reminders** — parse `"in 30 minutes"`, `"tomorrow 9am"`, `"Friday 3pm"` into real deadlines
 - **Terminal-native notifications** — reminder daemon via systemd, or inline via shell `PROMPT_COMMAND`
 - **Fully local** — all AI runs via [Ollama](https://ollama.com), no data leaves your machine
@@ -114,7 +113,6 @@ See [CONFIG.md](./CONFIG.md) for all keys, notifier options, CLI flag overrides,
 yaad add "<content>" [flags]
 
 Flags:
-  -f, --for     string   Why are you saving this? (context label)
       --remind  string   When to remind you ("in 30 minutes", "tomorrow 9am")
       --type    string   Override type detection: command|note|reminder|url|fact
       --tag     string   Add a tag (repeatable)
@@ -123,23 +121,20 @@ Flags:
 Examples:
 
 ```bash
-# Just save something — no flags needed
+# Just save something
 yaad add "kubectl rollout restart deployment/api"
 
-# A something you want to remember for later
-yaad add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
-  --for "yaad build session"
+# Include context right in the content — AI will find it later
+yaad add "yaad build session: claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644"
 
 # A time-sensitive reminder
 yaad add "book conference ticket" --remind "in 30 minutes"
 
 # A fact with tags
-yaad add "staging postgres is on port 5433" \
-  --for "backend infra" --tag postgres --tag staging
+yaad add "backend infra — staging postgres is on port 5433" --tag postgres --tag staging
 
-# A URL
-yaad add "https://pkg.go.dev/modernc.org/sqlite" \
-  --for "pure Go SQLite driver, no CGO"
+# A URL with context
+yaad add "pure Go SQLite driver, no CGO: https://pkg.go.dev/modernc.org/sqlite"
 ```
 
 ### Query your memories
