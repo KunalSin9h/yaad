@@ -5,7 +5,7 @@ argument-hint: "[query] or [add <content>] or [add <content> --remind 'when']"
 allowed-tools: Bash
 ---
 
-yaad is a local-first memory engine. Everything is stored on the user's machine. No cloud, no accounts.
+yaad is a CLI-based AI memory engine — the simplest way to save anything and retrieve it later in natural language. One command to store, one to recall. Everything stays on the user's machine, no cloud, no accounts.
 
 ## Check yaad is installed
 
@@ -29,39 +29,19 @@ Then stop — do not proceed until yaad is available.
 
 ```bash
 yaad add "<content>"
+```
+
+### Save with a reminder
+
+```bash
 yaad add "<content>" --remind "in 30 minutes"
 yaad add "<content>" --remind "tomorrow 9am"
-yaad add "<content>" --tag <tag>           # repeatable
-yaad add "<content>" --type command|note|url|fact|reminder
 ```
 
 ### Recall with natural language
 
 ```bash
 yaad ask "<question>"
-```
-
-### Browse saved memories
-
-```bash
-yaad list                    # 20 most recent
-yaad list --type command     # filter by type
-yaad list --tag postgres     # filter by tag
-yaad list --remind           # pending reminders only
-yaad list --limit 50
-```
-
-### Get full detail of one memory
-
-```bash
-yaad get <id>                # 10-char ULID prefix is enough
-```
-
-### Delete
-
-```bash
-yaad delete <id>
-yaad delete <id> -y          # skip confirmation
 ```
 
 ---
@@ -83,10 +63,9 @@ Put all context directly in the content — the AI embeds the full string, so se
 
 ```bash
 # good — self-contained, findable later
-yaad add "staging db is postgres on port 5433" --tag postgres
+yaad add "staging db is postgres on port 5433"
 yaad add "prod uses nginx, config at /etc/nginx/sites-enabled/app"
-yaad add "API rate limit is 100 req/min per token" --tag api
-yaad add "https://docs.stripe.com/api/charges" --tag stripe --tag reference
+yaad add "API rate limit is 100 req/min per token"
 yaad add "deploy checklist: run migrations, restart workers, clear cache"
 yaad add "standup at 10am" --remind "tomorrow 9:45am"
 
@@ -95,20 +74,20 @@ yaad add "port 5433"
 yaad add "check this later"
 ```
 
-## When to recall
+## Memory-first instinct
 
-- At the start of a session: run `yaad list` to surface relevant prior context
-- When the user asks "what was that X?" or "do I have anything about Y?" — run `yaad ask`
-- When a task looks familiar — check if the user has prior notes on it
+Before reaching for a tool (filesystem search, web search, re-asking the user), ask yourself: **could this already be in memory?**
 
-## Reminder setup
-
-To surface reminders in the terminal, the user should add to their shell config:
+If the answer is "maybe" — ask yaad first. It's cheaper than a search and respects what the user has already told you.
 
 ```bash
-# ~/.bashrc or ~/.zshrc
-export PROMPT_COMMAND="yaad check; $PROMPT_COMMAND"
-
-# zsh only
-precmd() { yaad check }
+yaad ask "<what you're looking for>"
 ```
+
+After finding or figuring something out that the user will likely need again, save it without being asked.
+
+## When to recall
+
+- At the start of a session, to surface relevant prior context
+- Whenever the user asks about something they may have mentioned before
+- Before any search — file, web, or otherwise — for facts, paths, configs, or decisions
