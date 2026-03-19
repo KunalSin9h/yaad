@@ -36,7 +36,17 @@ yaad add "<content>"
 ```bash
 yaad add "<content>" --remind "in 30 minutes"
 yaad add "<content>" --remind "tomorrow 9am"
+yaad add "<content>" --remind "sunday 9pm"
+yaad add "<content>" --remind "in 2 hours"
 ```
+
+### Check for due reminders
+
+```bash
+yaad check
+```
+
+Run this to surface any reminders that are currently due. Use it at the start of a session or any time you want to see what's pending.
 
 ### Recall with natural language
 
@@ -91,3 +101,13 @@ After finding or figuring something out that the user will likely need again, sa
 - At the start of a session, to surface relevant prior context
 - Whenever the user asks about something they may have mentioned before
 - Before any search — file, web, or otherwise — for facts, paths, configs, or decisions
+
+## Checking reminders at session start
+
+Run this at the beginning of every session:
+
+```bash
+yaad check
+```
+
+If anything is due, surface it to the user immediately before proceeding.
