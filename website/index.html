@@ -791,8 +791,6 @@
     <span class="marquee-item sep">·</span>
     <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"submit PR for review"</span> <span class="flag">--remind</span> <span class="str">"tomorrow 9am"</span></span>
     <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad get</span> <span class="str">01JTXK4A3B</span></span>
-    <span class="marquee-item sep">·</span>
     <!-- second copy (for seamless loop) -->
     <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"deploy prod at 3pm"</span> <span class="flag">--remind</span> <span class="str">"in 2h"</span></span>
     <span class="marquee-item sep">·</span>
@@ -805,8 +803,6 @@
     <span class="marquee-item"><span class="cmd">yaad ask</span> <span class="str">"any pending reminders for today?"</span></span>
     <span class="marquee-item sep">·</span>
     <span class="marquee-item"><span class="cmd">yaad add</span> <span class="str">"submit PR for review"</span> <span class="flag">--remind</span> <span class="str">"tomorrow 9am"</span></span>
-    <span class="marquee-item sep">·</span>
-    <span class="marquee-item"><span class="cmd">yaad get</span> <span class="str">01JTXK4A3B</span></span>
     <span class="marquee-item sep">·</span>
   </div>
 </div>
@@ -855,7 +851,7 @@
         </div>
         <span class="sr-only">reminders</span>
         <h3>Smart reminders</h3>
-        <p>Parse <code>"in 30 minutes"</code>, <code>"tomorrow 9am"</code>, or <code>"Friday 3pm"</code> into real deadlines.</p>
+        <p>Say <code>"in 30 minutes"</code>, <code>"tomorrow 9am"</code>, or <code>"Friday 3pm"</code> — yaad pings you right in the terminal.</p>
       </div>
       <div class="feature-card c-blue">
         <div class="feature-icon" aria-hidden="true">
@@ -949,7 +945,7 @@ npx skills add kunalsin9h/yaad</pre>
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"></circle><path d="M12 8v4l3 2"></path></svg>
       reminders
     </span>
-    <h2>Never miss a deadline.</h2>
+    <h2>Remind yourself, in the terminal.</h2>
     <p class="section-lead">Set a reminder while saving — yaad surfaces it right in your terminal when it's due.</p>
 
     <pre style="margin-bottom:2rem"><span class="c"># set a reminder while saving</span>
@@ -1028,7 +1024,7 @@ systemctl --user status yaad</pre>
     <div class="commands-grid">
       <div class="cmd-card">
         <div class="cmd-name">yaad add</div>
-        <p>Save anything. Include context right in the content — AI finds it later. <code>--remind</code> sets a deadline, <code>--tag</code> for filtering.</p>
+        <p>Save anything. Include context right in the content — AI finds it later. <code>--remind</code> schedules a terminal nudge, <code>--tag</code> for filtering.</p>
         <pre style="margin-top:.75rem;font-size:.75rem">yaad add <span class="s">"backend infra: staging db port is 5433"</span>
 yaad add <span class="s">"submit PR for review"</span> <span class="k">--remind</span> <span class="s">"tomorrow 9am"</span>
 yaad add <span class="s">"prod login: ssh -i ~/.ssh/id_rsa user@prod"</span>
