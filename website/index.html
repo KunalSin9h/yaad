@@ -7,7 +7,7 @@
   <meta name="description" content="The simplest local memory engine. No servers, no SDKs, no complexity. Save anything, recall with natural language. For humans in the terminal and AI agents via skills." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -45,7 +45,17 @@
     a { color: var(--green); text-decoration: none; }
     a:hover { text-decoration: underline; }
     code, pre, .mono {
-      font-family: "SF Mono", "Fira Code", "Cascadia Code", "Courier New", monospace;
+      font-family: "JetBrains Mono", "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    }
+
+    /* ─── GRAIN OVERLAY ─── */
+    body::after {
+      content: "";
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 9999;
+      opacity: .025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
     }
 
     /* ─── NAV ─── */
@@ -145,10 +155,15 @@
       font-weight: 800;
       letter-spacing: -.04em;
       line-height: .88;
-      background: linear-gradient(120deg, #9cffb0 0%, #7dd3fc 40%, #fbbf24 70%, #fb7185 100%);
+      background: linear-gradient(120deg, #9cffb0 0%, #7dd3fc 30%, #fbbf24 60%, #fb7185 80%, #9cffb0 100%);
+      background-size: 200% auto;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      filter: drop-shadow(0 0 60px rgba(74,222,128,.12));
+      filter: drop-shadow(0 0 60px rgba(74,222,128,.15));
+      animation: shimmer 8s linear infinite;
+    }
+    @keyframes shimmer {
+      to { background-position: 200% center; }
     }
     .hero-tagline {
       font-family: "SF Mono", "Fira Code", monospace;
@@ -601,6 +616,43 @@
       .hero-wordmark { font-size: clamp(5rem, 28vw, 7rem); }
     }
 
+    /* ─── SCROLL REVEAL ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── CURSOR BLINK ─── */
+    .t-cursor {
+      display: inline-block;
+      width: 7px; height: 1em;
+      background: var(--green);
+      opacity: .7;
+      vertical-align: text-bottom;
+      animation: blink 1.1s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:.7} 50%{opacity:0} }
+
+    /* ─── NAV GET STARTED ─── */
+    .nav-getstarted { color: var(--green) !important; }
+
+    /* ─── INSTALL CMD COPY ─── */
+    .install-cmd { cursor: pointer; }
+    .install-cmd.copied { border-color: var(--green) !important; }
+    .install-cmd .copy-hint {
+      font-size: .65rem; color: var(--dim);
+      margin-left: auto; letter-spacing: .04em;
+      transition: color .15s;
+    }
+    .install-cmd:hover .copy-hint { color: var(--muted); }
+    .install-cmd.copied .copy-hint { color: var(--green); }
+
+    /* ─── FEATURE ICON HOVER ─── */
+    .feature-icon { transition: transform .2s ease; }
+    .feature-card:hover .feature-icon { transform: scale(1.08); }
+
     .sr-only {
       position: absolute;
       width: 1px;
@@ -623,8 +675,8 @@
     <a href="#features">features</a>
     <a href="#agents">agents</a>
     <a href="#reminders">reminders</a>
-    <a href="#install">install</a>
     <a href="#usage">usage</a>
+    <a href="/blog/get-started.html" class="nav-getstarted">get started →</a>
   </div>
   <a href="https://github.com/KunalSin9h/yaad" class="nav-gh" target="_blank" rel="noopener">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
@@ -656,13 +708,14 @@
     No servers. No SDKs. No complexity. Just save anything, recall it with natural language.
     Works for humans in the terminal and for AI agents as a skill.
   </p>
-  <div class="install-cmd" style="margin:0 auto 1.5rem;max-width:480px;justify-content:center;">
+  <div class="install-cmd" style="margin:0 auto 1.5rem;max-width:480px;justify-content:center;" onclick="copyInstall(this,'curl -fsSL https://yaad.knl.co.in/install.sh | bash')">
     <span class="dollar">$</span>
     curl -fsSL https://yaad.knl.co.in/install.sh | bash
+    <span class="copy-hint">copy</span>
   </div>
 
   <div class="hero-actions">
-    <a href="#install" class="btn-primary">Get started →</a>
+    <a href="/blog/get-started.html" class="btn-primary">Get started →</a>
     <a href="https://github.com/KunalSin9h/yaad" class="btn-ghost" target="_blank" rel="noopener">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-.1em;margin-right:.3rem"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
       View on GitHub
@@ -689,6 +742,8 @@
         <div class="t-out"><span style="color:var(--dim)">── recall anytime ───────────────────</span></div>
         <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"claude session for db migration?"</span></div>
         <div class="t-ans">  3fa2c891-7b4e-4d1a-9f3c-2e8b5a6d0c19</div>
+        <span class="t-blank"></span>
+        <div><span class="t-prompt">❯ </span><span class="t-cursor"></span></div>
       </div>
     </div>
 
@@ -713,6 +768,8 @@
         <div class="t-out"><span style="color:var(--dim)">── agent saves discoveries ───────────</span></div>
         <div><span class="t-prompt">❯ </span><span class="t-cmd">/yaad add </span><span class="t-str">"deploy: always run migrations first"</span></div>
         <div class="t-out">  saved &nbsp;[note]</div>
+        <span class="t-blank"></span>
+        <div><span class="t-prompt">❯ </span><span class="t-cursor"></span></div>
       </div>
     </div>
   </div>
@@ -957,57 +1014,6 @@ systemctl --user status yaad</pre>
   </div>
 </section>
 
-<!-- ─── INSTALL ─── -->
-<section id="install">
-  <div class="section-inner">
-    <span class="label amber">
-      <svg viewBox="0 0 24 24"><path d="M12 4v10"></path><path d="M8 10l4 4 4-4"></path><rect x="4" y="16" width="16" height="4" rx="1"></rect></svg>
-      installation
-    </span>
-    <h2>Up and running in minutes.</h2>
-    <p class="section-lead">Requires Ollama running locally.</p>
-
-    <div class="install-steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <h4>Install Ollama and pull models</h4>
-          <p>Get Ollama from <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a>, then pull the required models.</p>
-          <pre><span class="c"># embeddings model</span>
-<span class="k">ollama pull</span> mxbai-embed-large
-<span class="c"># chat / reasoning model (swap for any compatible one)</span>
-<span class="k">ollama pull</span> llama3.2:3b</pre>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <h4>Install yaad</h4>
-	  <pre><span class="k">curl -fsSL</span> https://yaad.knl.co.in/install.sh <span class="k">| bash</span></pre>
-	  <h6>or download from <a href="https://github.com/KunalSin9h/yaad/releases" target="_black">release</a></h6>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <h4>Initialise config</h4>
-          <pre>yaad config init</pre>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <h4>Save your first memory</h4>
-          <pre>yaad add <span class="s">"staging db is postgres on port 5433"</span></pre>
-        </div>
-      </div>
-    </div>
-
-    <p style="margin-top:2.5rem;font-size:.95rem;color:var(--muted);">
-      Also <a href="#reminders">set up reminders</a> — it's yaad's most powerful feature and takes 30 seconds.
-    </p>
-  </div>
-</section>
 
 <!-- ─── USAGE ─── -->
 <section id="usage">
@@ -1077,16 +1083,18 @@ yaad config list</pre>
     <h2>Memory for you.<br />Memory for your agents.</h2>
     <p>Simple. Local. Open source. MIT licensed.</p>
     <div class="hero-actions" style="justify-content:center">
-      <a href="#install" class="btn-primary">Install yaad →</a>
+      <a href="/blog/get-started.html" class="btn-primary">Get started →</a>
       <a href="https://github.com/KunalSin9h/yaad" class="btn-ghost" target="_blank" rel="noopener">Star on GitHub</a>
     </div>
-    <div class="install-cmd" style="margin-bottom:.75rem">
+    <div class="install-cmd" style="margin-bottom:.75rem" onclick="copyInstall(this,'curl -fsSL https://yaad.knl.co.in/install.sh | bash')">
       <span class="dollar">$</span>
       curl -fsSL https://yaad.knl.co.in/install.sh | bash
+      <span class="copy-hint">copy</span>
     </div>
-    <div class="install-cmd">
+    <div class="install-cmd" onclick="copyInstall(this,'npx skills add kunalsin9h/yaad -g')">
       <span class="dollar">$</span>
       npx skills add kunalsin9h/yaad -g
+      <span class="copy-hint">copy</span>
     </div>
   </div>
 </section>
@@ -1102,5 +1110,31 @@ yaad config list</pre>
   <span>Built by <a href="https://github.com/KunalSin9h" target="_blank" rel="noopener">Kunal Singh</a></span>
 </footer>
 
+<script>
+  // ── scroll reveal ──
+  const revealEls = document.querySelectorAll('section, .features-grid, .commands-grid, .reminder-options, .modes-split');
+  const revealIo = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealIo.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.07 });
+  revealEls.forEach(el => { el.classList.add('reveal'); revealIo.observe(el); });
+
+  // ── copy install commands ──
+  function copyInstall(el, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const hint = el.querySelector('.copy-hint');
+      el.classList.add('copied');
+      if (hint) hint.textContent = 'copied!';
+      setTimeout(() => {
+        el.classList.remove('copied');
+        if (hint) hint.textContent = 'copy';
+      }, 1800);
+    });
+  }
+</script>
 </body>
 </html>

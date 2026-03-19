@@ -422,76 +422,41 @@
       <div class="post-meta">
         <span class="post-tag">guide</span>
         <span class="post-sep">·</span>
-        <span>5 min read</span>
+        <span>5 min</span>
         <span class="post-sep">·</span>
         <span>March 2026</span>
       </div>
       <h1>Get Started<br />with yaad</h1>
       <p class="lead">
-        yaad is a CLI memory engine. One command to save, one to recall — in plain English, weeks later. This guide gets you from zero to your first memory, then wires yaad into your AI agent so it remembers things across sessions too.
+        A CLI memory engine. One command to store, one to recall — in plain English, any time later. Works for you in the terminal and for your AI agents as a skill.
       </p>
-      <div class="tldr">
-        <div class="tldr-label">TL;DR</div>
-        <p>Install yaad, run <code>yaad add "..."</code> to save, <code>yaad ask "..."</code> to recall. Add to your agent with <code>npx skills add kunalsin9h/yaad -g</code>.</p>
-      </div>
     </div>
 
     <!-- STEP 1 -->
     <div class="step-block" id="step-1">
       <div class="step-heading">
-        <div class="step-num-wrap">
-          <div class="step-num">01</div>
-        </div>
+        <div class="step-num-wrap"><div class="step-num">01</div></div>
         <h2>Install Ollama</h2>
       </div>
-
-      <p>yaad uses <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> to run AI locally — for embeddings (finding memories semantically) and for answering questions. Nothing leaves your machine.</p>
-
-      <p>Install Ollama from <a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a>, then pull the two models yaad needs:</p>
-
+      <p>yaad runs AI locally via <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> — nothing leaves your machine. Install it, then pull the two models:</p>
       <div class="code-wrap">
-        <pre><span class="c"># embeddings — used to index and search memories</span>
-ollama pull mxbai-embed-large
-
-<span class="c"># chat model — used to answer your questions</span>
-ollama pull llama3.2:3b</pre>
+        <pre>ollama pull mxbai-embed-large  <span class="c"># for search</span>
+ollama pull llama3.2:3b        <span class="c"># for recall (swap for any chat model)</span></pre>
         <button class="copy-btn" onclick="copyCode(this)">copy</button>
       </div>
-
-      <p>The embedding model is fixed. The chat model is your choice — any Ollama-compatible model works. <code>llama3.2:3b</code> is fast on most hardware and good enough for recall tasks.</p>
     </div>
 
     <!-- STEP 2 -->
     <div class="step-block" id="step-2">
       <div class="step-heading">
-        <div class="step-num-wrap">
-          <div class="step-num">02</div>
-        </div>
+        <div class="step-num-wrap"><div class="step-num">02</div></div>
         <h2>Install yaad</h2>
       </div>
-
-      <p>One-liner for Linux and macOS:</p>
-
       <div class="code-wrap">
         <pre><span class="k">curl</span> -fsSL https://yaad.knl.co.in/install.sh <span class="k">| bash</span></pre>
         <button class="copy-btn" onclick="copyCode(this)">copy</button>
       </div>
-
-      <p>This fetches the latest release from GitHub, detects your OS and arch, and installs to <code>/usr/local/bin</code> (or <code>~/.local/bin</code> if that's not writable). Verify it worked:</p>
-
-      <div class="terminal">
-        <div class="terminal-bar">
-          <div class="tb-dot tb-r"></div><div class="tb-dot tb-y"></div><div class="tb-dot tb-g"></div>
-          <span class="terminal-title">shell</span>
-        </div>
-        <div class="terminal-body">
-          <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad --version</span></div>
-          <div class="t-out">  yaad v0.3.0</div>
-        </div>
-      </div>
-
-      <p>Then initialise config. This writes <code>~/.yaadrc</code> with commented defaults — you don't need to touch it to get started:</p>
-
+      <p>Then initialise config:</p>
       <div class="code-wrap">
         <pre>yaad config init</pre>
         <button class="copy-btn" onclick="copyCode(this)">copy</button>
@@ -501,14 +466,10 @@ ollama pull llama3.2:3b</pre>
     <!-- STEP 3 -->
     <div class="step-block" id="step-3">
       <div class="step-heading">
-        <div class="step-num-wrap">
-          <div class="step-num">03</div>
-        </div>
+        <div class="step-num-wrap"><div class="step-num">03</div></div>
         <h2>Save your first memory</h2>
       </div>
-
-      <p>yaad has two core commands. <code>add</code> saves. <code>ask</code> recalls. That's the whole loop.</p>
-
+      <p>Put all context in the content — the AI searches by meaning, so more detail means better recall later.</p>
       <div class="terminal">
         <div class="terminal-bar">
           <div class="tb-dot tb-r"></div><div class="tb-dot tb-y"></div><div class="tb-dot tb-g"></div>
@@ -518,32 +479,19 @@ ollama pull llama3.2:3b</pre>
           <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"staging db is postgres on port 5433, host db.internal"</span></div>
           <div class="t-out">  saved &nbsp;[fact]</div>
           <span class="t-blank"></span>
-          <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"prod login: ssh -i ~/.ssh/id_rsa deploy@bastion.prod.internal"</span></div>
-          <div class="t-out">  saved &nbsp;[command]</div>
-          <span class="t-blank"></span>
-          <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"deploy checklist: run migrations first, then restart workers, then clear cache"</span></div>
+          <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"deploy: run migrations first, restart workers, then clear cache"</span></div>
           <div class="t-out">  saved &nbsp;[note]</div>
         </div>
-      </div>
-
-      <p>yaad auto-detects the type (<code>fact</code>, <code>command</code>, <code>note</code>, <code>url</code>, <code>reminder</code>) and embeds the content for semantic search. Both happen concurrently in the background — the save itself is instant even if Ollama is busy.</p>
-
-      <div class="callout">
-        <p><strong>Write self-contained memories.</strong> The AI searches by meaning, not keywords. "port 5433" is hard to find later. "staging db is postgres on port 5433, host db.internal" surfaces reliably even if you ask "what's the staging database address?" three weeks later.</p>
       </div>
     </div>
 
     <!-- STEP 4 -->
     <div class="step-block" id="step-4">
       <div class="step-heading">
-        <div class="step-num-wrap">
-          <div class="step-num">04</div>
-        </div>
+        <div class="step-num-wrap"><div class="step-num">04</div></div>
         <h2>Recall with natural language</h2>
       </div>
-
-      <p>Ask what you want to know. You don't need to remember what you typed when saving:</p>
-
+      <p>Ask in plain English — phrased however feels natural, not how you saved it.</p>
       <div class="terminal">
         <div class="terminal-bar">
           <div class="tb-dot tb-r"></div><div class="tb-dot tb-y"></div><div class="tb-dot tb-g"></div>
@@ -551,53 +499,38 @@ ollama pull llama3.2:3b</pre>
         </div>
         <div class="terminal-body">
           <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"how do I connect to staging?"</span></div>
-          <div class="t-ans">  The staging database is postgres on port 5433 at db.internal.</div>
+          <div class="t-ans">  postgres on port 5433, host db.internal</div>
           <span class="t-blank"></span>
-          <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"what do I need to do before deploying?"</span></div>
-          <div class="t-ans">  Run migrations first, then restart workers, then clear cache.</div>
+          <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad ask </span><span class="t-str">"what's the deploy order?"</span></div>
+          <div class="t-ans">  Run migrations first, restart workers, then clear cache.</div>
         </div>
       </div>
-
-      <p>Under the hood: yaad embeds your question, finds the most semantically similar memories, and passes them as context to the LLM, which synthesises an answer. It works with questions phrased differently from how you saved things.</p>
     </div>
 
     <!-- STEP 5 -->
     <div class="step-block" id="step-5">
       <div class="step-heading">
-        <div class="step-num-wrap">
-          <div class="step-num">05</div>
-        </div>
+        <div class="step-num-wrap"><div class="step-num">05</div></div>
         <h2>Set a reminder</h2>
       </div>
-
-      <p>Reminders are memories with a <code>--remind</code> flag. yaad parses natural language time expressions:</p>
-
+      <p>Add <code>--remind</code> with any natural language time. Surface it by hooking into your shell prompt:</p>
       <div class="terminal">
         <div class="terminal-bar">
           <div class="tb-dot tb-r"></div><div class="tb-dot tb-y"></div><div class="tb-dot tb-g"></div>
           <span class="terminal-title">shell</span>
         </div>
         <div class="terminal-body">
-          <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"submit the PR for review"</span><span class="t-flag"> --remind </span><span class="t-str">"in 2 hours"</span></div>
-          <div class="t-out">  saved &nbsp;[reminder] · due in 2h</div>
-          <span class="t-blank"></span>
-          <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"book flight tickets"</span><span class="t-flag"> --remind </span><span class="t-str">"tomorrow 9am"</span></div>
+          <div><span class="t-prompt">❯ </span><span class="t-cmd">yaad add </span><span class="t-str">"submit PR for review"</span><span class="t-flag"> --remind </span><span class="t-str">"tomorrow 9am"</span></div>
           <div class="t-out">  saved &nbsp;[reminder] · due tomorrow 09:00</div>
         </div>
       </div>
-
-      <p>To surface reminders in your terminal, add one line to your shell config:</p>
-
       <div class="code-wrap">
-        <pre><span class="c"># ~/.bashrc or ~/.zshrc</span>
+        <pre><span class="c"># add to ~/.bashrc or ~/.zshrc</span>
 export PROMPT_COMMAND=<span class="s">"yaad check; $PROMPT_COMMAND"</span>
-
-<span class="c"># zsh only</span>
+<span class="c"># zsh</span>
 precmd() { yaad check }</pre>
         <button class="copy-btn" onclick="copyCode(this)">copy</button>
       </div>
-
-      <p>When a reminder fires, yaad prints it inline on the next prompt — no background process needed.</p>
     </div>
 
     <hr class="section-break" />
@@ -605,53 +538,35 @@ precmd() { yaad check }</pre>
     <!-- STEP 6 -->
     <div class="step-block" id="step-6">
       <div class="step-heading">
-        <div class="step-num-wrap">
-          <div class="step-num">06</div>
-        </div>
-        <h2>Wire it into your AI agent</h2>
+        <div class="step-num-wrap"><div class="step-num">06</div></div>
+        <h2>Add to your AI agent</h2>
       </div>
-
-      <p>yaad ships as an <a href="https://github.com/vercel-labs/skills" target="_blank" rel="noopener">Agent Skill</a> — a standard for giving AI agents persistent, reusable capabilities. Install once, every agent session gets memory.</p>
-
+      <p>Install the <a href="https://github.com/vercel-labs/skills" target="_blank" rel="noopener">Agent Skill</a> once — your agent can save and recall memory across every session, automatically.</p>
       <div class="code-wrap">
         <pre>npx skills add kunalsin9h/yaad <span class="f">-g</span></pre>
         <button class="copy-btn" onclick="copyCode(this)">copy</button>
       </div>
-
-      <p>The <code>-g</code> flag installs globally — available in every Claude Code, Cursor, or Codex session you open. Without it, the skill is scoped to the current directory.</p>
-
-      <p>Once installed, your agent gets the <code>/yaad</code> slash command:</p>
-
       <div class="terminal">
         <div class="terminal-bar">
           <div class="tb-dot tb-r"></div><div class="tb-dot tb-y"></div><div class="tb-dot tb-g"></div>
-          <span class="terminal-title">agent session — claude code</span>
+          <span class="terminal-title">claude code</span>
         </div>
         <div class="terminal-body">
-          <div class="t-out"><span style="color:var(--dim)">── recall ───────────────────────────</span></div>
-          <div><span class="t-prompt">❯ </span><span class="t-cmd">/yaad </span><span class="t-str">"what's the staging db setup?"</span></div>
+          <div><span class="t-prompt">❯ </span><span class="t-cmd">/yaad </span><span class="t-str">"what's the staging db?"</span></div>
           <div class="t-ans">  postgres on port 5433, host db.internal</div>
           <span class="t-blank"></span>
-          <div class="t-out"><span style="color:var(--dim)">── save ─────────────────────────────</span></div>
-          <div><span class="t-prompt">❯ </span><span class="t-cmd">/yaad add </span><span class="t-str">"nginx config lives at /etc/nginx/sites-enabled/app"</span></div>
-          <div class="t-out">  saved &nbsp;[fact]</div>
-          <span class="t-blank"></span>
-          <div class="t-out"><span style="color:var(--dim)">── remind ───────────────────────────</span></div>
           <div><span class="t-prompt">❯ </span><span class="t-cmd">/yaad add </span><span class="t-str">"review PR #42"</span><span class="t-flag"> --remind </span><span class="t-str">"tomorrow 9am"</span></div>
           <div class="t-out">  saved &nbsp;[reminder] · due tomorrow 09:00</div>
         </div>
       </div>
-
-      <p>The agent also uses yaad proactively: before searching the filesystem or asking you for context it may already have, it checks memory first. Discoveries it makes during a session get saved automatically — without being prompted.</p>
-
-      <p>Terminal and agent share the same local store. Save something in the terminal, your agent can recall it. Agent saves something, you can query it with <code>yaad ask</code>. One store, multiple access points.</p>
+      <p>Your terminal and agent share the same store. Save in one, recall in the other.</p>
 
       <div class="next-steps">
         <div class="next-steps-label">What's next</div>
         <ul>
           <li><a href="https://github.com/KunalSin9h/yaad/blob/main/COMMANDS.md">Full command reference</a> — list, get, delete, config, all flags</li>
-          <li><a href="https://github.com/KunalSin9h/yaad/blob/main/REMINDERS.md">Reminder setup guide</a> — PROMPT_COMMAND and systemd daemon</li>
-          <li><a href="https://github.com/KunalSin9h/yaad/blob/main/CONFIG.md">Configuration reference</a> — swap models, set Ollama URL, notifier options</li>
+          <li><a href="https://github.com/KunalSin9h/yaad/blob/main/REMINDERS.md">Reminder setup</a> — PROMPT_COMMAND and systemd daemon</li>
+          <li><a href="https://github.com/KunalSin9h/yaad/blob/main/CONFIG.md">Configuration</a> — swap models, Ollama URL, notifier options</li>
         </ul>
       </div>
     </div>
