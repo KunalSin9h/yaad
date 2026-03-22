@@ -2,39 +2,28 @@
 
 ## yaad
 
-> The simplest local memory engine — for you and your agents.
+> Memory for your terminal.
 
-> [yaad.knl.co.in](https://yaad.knl.co.in/)
+[![Go](https://img.shields.io/badge/go-1.22+-blue)](https://go.dev) [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE) [![yaad.knl.co.in](https://img.shields.io/badge/site-yaad.knl.co.in-purple)](https://yaad.knl.co.in/)
 
-No servers. No SDKs. No complexity. Save anything, recall it with natural language. Works for humans in the terminal and for AI agents as a skill. Everything runs locally via Ollama — no cloud, no accounts.
+You forget the staging DB port. The curl flag that fixed that weird error. The deploy steps for this service. yaad saves it — and gives it back when you ask.
+
+Runs entirely local via Ollama. No cloud, no accounts, no API keys.
 
 ```bash
-# Save anything
-yaad add "staging db is postgres on port 5433"
-yaad add "deploy checklist: run migrations, restart workers, clear cache"
+$ yaad add "staging db is postgres on port 5433"
+$ yaad add "deploy checklist: run migrations, restart workers, clear cache"
 
-# Set a reminder
-yaad add "book conference ticket" --remind "in 30 minutes"
+$ yaad ask "what port is staging on?"
+→ Staging DB is postgres on port 5433.
 
-# Ask anything
-yaad ask "what's the staging db port?"
-yaad ask "do I have anything due tonight?"
+$ yaad ask "what's the deploy checklist?"
+→ Run migrations, restart workers, then clear cache.
 ```
 
 ---
 
-## Requirements
-
-- [Ollama](https://ollama.com) running locally
-
-```bash
-ollama pull mxbai-embed-large  # embeddings
-ollama pull llama3.2:3b        # reasoning (or any chat model you prefer)
-```
-
----
-
-## Installation
+## Install
 
 **Linux / macOS:**
 
@@ -50,6 +39,28 @@ go install github.com/kunalsin9h/yaad/cmd/yaad@latest
 
 **Pre-built binaries** — [GitHub Releases](https://github.com/KunalSin9h/yaad/releases).
 
+Then pull two Ollama models (one-time):
+
+```bash
+ollama pull mxbai-embed-large  # embeddings
+ollama pull llama3.2:3b        # reasoning (or any chat model you prefer)
+```
+
+> Requires [Ollama](https://ollama.com) running locally.
+
+---
+
+## Reminders
+
+yaad can remind you of things right in your terminal when they're due.
+
+```bash
+yaad add "submit PR for review" --remind "tomorrow 9am"
+yaad add "book conference ticket" --remind "in 30 minutes"
+```
+
+See [REMINDERS.md](./docs/REMINDERS.md) for setup (shell hook or systemd daemon).
+
 ---
 
 ## Agent Integration
@@ -61,18 +72,6 @@ npx skills add kunalsin9h/yaad -g
 ```
 
 Once installed, your agent saves and recalls memory across sessions automatically.
-
----
-
-## Reminders
-
-yaad can remind you of things right in your terminal when they're due.
-
-```bash
-yaad add "submit PR for review" --remind "tomorrow 9am"
-```
-
-See [REMINDERS.md](./docs/REMINDERS.md) for setup (shell hook or systemd daemon).
 
 ---
 
