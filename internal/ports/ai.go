@@ -10,7 +10,5 @@ import (
 // Implemented by: adapters/ollama.Client
 type AIPort interface {
 	Embed(ctx context.Context, text string) ([]float32, error)
-	DetectType(ctx context.Context, content string) (domain.MemoryType, error)
-	ExtractTags(ctx context.Context, content, forLabel string) ([]string, error)
 	Answer(ctx context.Context, question string, memories []*domain.Memory) (string, error)
 }
