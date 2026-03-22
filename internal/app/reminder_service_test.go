@@ -28,8 +28,6 @@ func saveReminder(t *testing.T, db *sqliteadapter.DB, id string, remindAt time.T
 	m := &domain.Memory{
 		ID:        id,
 		Content:   "reminder: " + id,
-		Type:      domain.MemoryTypeReminder,
-		Tags:      []string{},
 		CreatedAt: time.Now(),
 		RemindAt:  &remindAt,
 	}

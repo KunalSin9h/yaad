@@ -22,14 +22,12 @@ func newTestDB(t *testing.T) *sqliteadapter.DB {
 
 func sampleMemory(id string) *domain.Memory {
 	return &domain.Memory{
-		ID:        id,
-		Content:   "sample content " + id,
-		ForLabel:  "sample for label",
-		Type:      domain.MemoryTypeNote,
-		Tags:      []string{"go", "test"},
+		ID:         id,
+		Content:    "sample content " + id,
+		ForLabel:   "sample for label",
 		WorkingDir: "/home/test",
-		Hostname:  "testhost",
-		CreatedAt: time.Now().UTC().Truncate(time.Second),
+		Hostname:   "testhost",
+		CreatedAt:  time.Now().UTC().Truncate(time.Second),
 	}
 }
 
@@ -48,8 +46,6 @@ func TestStore_SaveAndGetByID(t *testing.T) {
 	assert.Equal(t, m.ID, got.ID)
 	assert.Equal(t, m.Content, got.Content)
 	assert.Equal(t, m.ForLabel, got.ForLabel)
-	assert.Equal(t, m.Type, got.Type)
-	assert.Equal(t, m.Tags, got.Tags)
 	assert.Equal(t, m.WorkingDir, got.WorkingDir)
 	assert.Equal(t, m.Hostname, got.Hostname)
 }
@@ -78,7 +74,6 @@ func TestStore_Save_WithRemindAt(t *testing.T) {
 	db := newTestDB(t)
 	ctx := context.Background()
 	m := sampleMemory("01REMIND")
-	m.Type = domain.MemoryTypeReminder
 	remindAt := time.Now().Add(1 * time.Hour).UTC().Truncate(time.Second)
 	m.RemindAt = &remindAt
 
@@ -104,47 +99,12 @@ func TestStore_List_All(t *testing.T) {
 	assert.Len(t, results, 3)
 }
 
-func TestStore_List_FilterByType(t *testing.T) {
-	db := newTestDB(t)
-	ctx := context.Background()
-
-	note := sampleMemory("01NOTE01")
-	note.Type = domain.MemoryTypeNote
-	cmd := sampleMemory("01CMD001")
-	cmd.Type = domain.MemoryTypeCommand
-	require.NoError(t, db.Store.Save(ctx, note))
-	require.NoError(t, db.Store.Save(ctx, cmd))
-
-	results, err := db.Store.List(ctx, domain.ListFilter{Type: domain.MemoryTypeCommand})
-	require.NoError(t, err)
-	require.Len(t, results, 1)
-	assert.Equal(t, domain.MemoryTypeCommand, results[0].Type)
-}
-
-func TestStore_List_FilterByTag(t *testing.T) {
-	db := newTestDB(t)
-	ctx := context.Background()
-
-	m1 := sampleMemory("01TAGA01")
-	m1.Tags = []string{"docker", "networking"}
-	m2 := sampleMemory("01TAGB01")
-	m2.Tags = []string{"golang", "cli"}
-	require.NoError(t, db.Store.Save(ctx, m1))
-	require.NoError(t, db.Store.Save(ctx, m2))
-
-	results, err := db.Store.List(ctx, domain.ListFilter{Tag: "docker"})
-	require.NoError(t, err)
-	require.Len(t, results, 1)
-	assert.Equal(t, "01TAGA01", results[0].ID)
-}
-
 func TestStore_List_OnlyReminders(t *testing.T) {
 	db := newTestDB(t)
 	ctx := context.Background()
 
 	plain := sampleMemory("01PLAIN1")
 	reminder := sampleMemory("01REMND1")
-	reminder.Type = domain.MemoryTypeReminder
 	t1 := time.Now().Add(1 * time.Hour)
 	reminder.RemindAt = &t1
 	require.NoError(t, db.Store.Save(ctx, plain))
@@ -234,12 +194,10 @@ func TestStore_PendingReminders(t *testing.T) {
 	ctx := context.Background()
 
 	due := sampleMemory("01DUE001")
-	due.Type = domain.MemoryTypeReminder
 	dueAt := time.Now().Add(-1 * time.Minute) // already past
 	due.RemindAt = &dueAt
 
 	future := sampleMemory("01FUT001")
-	future.Type = domain.MemoryTypeReminder
 	futureAt := time.Now().Add(1 * time.Hour) // not yet
 	future.RemindAt = &futureAt
 
@@ -260,7 +218,6 @@ func TestStore_MarkReminded(t *testing.T) {
 	ctx := context.Background()
 
 	m := sampleMemory("01MARKR1")
-	m.Type = domain.MemoryTypeReminder
 	dueAt := time.Now().Add(-1 * time.Minute)
 	m.RemindAt = &dueAt
 	require.NoError(t, db.Store.Save(ctx, m))

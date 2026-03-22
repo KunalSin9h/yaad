@@ -79,8 +79,6 @@ func TestMemoryService_Add_WithRemindExpr_SetsRemindAt(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, m.RemindAt)
 	assert.WithinDuration(t, wantRemind, *m.RemindAt, time.Second)
-	assert.Equal(t, domain.MemoryTypeReminder, m.Type,
-		"type should default to reminder when RemindExpr is set")
 }
 
 func TestMemoryService_Add_InvalidRemindExpr_ReturnsError(t *testing.T) {
@@ -98,31 +96,9 @@ func TestMemoryService_Add_InvalidRemindExpr_ReturnsError(t *testing.T) {
 	assert.ErrorIs(t, err, domain.ErrInvalidRemindExpr)
 }
 
-func TestMemoryService_Add_TypeHint_OverridesAIDetection(t *testing.T) {
-	ai := &testutil.MockAI{
-		DetectTypeFn: func(_ context.Context, _ string) (domain.MemoryType, error) {
-			return domain.MemoryTypeNote, nil // AI would say "note"
-		},
-	}
-	svc, _ := newMemoryService(t, ai, &testutil.MockTimeParser{})
-
-	m, err := svc.Add(context.Background(), app.AddRequest{
-		Content:  "some content",
-		TypeHint: domain.MemoryTypeCommand, // user says "command"
-	})
-	require.NoError(t, err)
-	assert.Equal(t, domain.MemoryTypeCommand, m.Type)
-}
-
 func TestMemoryService_Add_AIFailure_StillSaves(t *testing.T) {
 	ai := &testutil.MockAI{
 		EmbedFn: func(_ context.Context, _ string) ([]float32, error) {
-			return nil, errors.New("ollama not running")
-		},
-		DetectTypeFn: func(_ context.Context, _ string) (domain.MemoryType, error) {
-			return "", errors.New("ollama not running")
-		},
-		ExtractTagsFn: func(_ context.Context, _, _ string) ([]string, error) {
 			return nil, errors.New("ollama not running")
 		},
 	}
@@ -137,23 +113,6 @@ func TestMemoryService_Add_AIFailure_StillSaves(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "important note", got.Content)
 	assert.Empty(t, got.Embedding)
-}
-
-func TestMemoryService_Add_MergesAITagsWithExtraTags(t *testing.T) {
-	ai := &testutil.MockAI{
-		ExtractTagsFn: func(_ context.Context, _, _ string) ([]string, error) {
-			return []string{"ai-tag"}, nil
-		},
-	}
-	svc, _ := newMemoryService(t, ai, &testutil.MockTimeParser{})
-
-	m, err := svc.Add(context.Background(), app.AddRequest{
-		Content:   "test",
-		ExtraTags: []string{"user-tag"},
-	})
-	require.NoError(t, err)
-	assert.Contains(t, m.Tags, "user-tag")
-	assert.Contains(t, m.Tags, "ai-tag")
 }
 
 // --- Ask ---
