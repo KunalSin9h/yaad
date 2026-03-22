@@ -151,13 +151,12 @@ section "add: basic memory"
 
 out=$(yaad add "claude --resume abc123" --for "yaad build session")
 assert_contains "add prints saved ID"   "$out" "saved"
-assert_contains "add prints type"       "$out" "type"
 
 # Extract the ID from the output for later use
 SAVED_ID=$(echo "$out" | grep "^saved" | awk '{print $2}')
 
-out=$(yaad add "postgres is on port 5433" --for "staging env" --tag db --tag postgres)
-assert_contains "add with tags confirms save" "$out" "saved"
+out=$(yaad add "postgres is on port 5433" --for "staging env")
+assert_contains "add with --for confirms save" "$out" "saved"
 
 out=$(yaad add "https://pkg.go.dev/modernc.org/sqlite" --for "pure go sqlite driver")
 assert_contains "add URL confirms save" "$out" "saved"
@@ -165,21 +164,11 @@ assert_contains "add URL confirms save" "$out" "saved"
 out=$(yaad add "some plain note without context")
 assert_contains "add without --for still saves" "$out" "saved"
 
-# ── 4. add --type override ────────────────────────────────────────────────────
-section "add: --type flag overrides AI detection"
-
-out=$(yaad add "docker run --rm alpine sh" --type command)
-assert_contains "add --type command accepted" "$out" "command"
-
-out=$(yaad add "the capital of France is Paris" --type fact)
-assert_contains "add --type fact accepted" "$out" "fact"
-
-# ── 5. add --remind ───────────────────────────────────────────────────────────
+# ── 4. add --remind ───────────────────────────────────────────────────────────
 section "add: --remind sets reminder"
 
 out=$(yaad add "book conference ticket" --remind "in 30 minutes")
 assert_contains "add --remind shows remind time" "$out" "remind"
-assert_contains "add --remind infers type=reminder" "$out" "reminder"
 
 out=$(yaad add "call the dentist" --remind "tomorrow 9am")
 assert_contains "add --remind tomorrow 9am" "$out" "remind"
@@ -194,13 +183,6 @@ section "list: filtering and display"
 out=$(yaad list)
 assert_contains "list shows saved memories"        "$out" "claude --resume"
 assert_contains "list shows content column header" "$out" "CONTENT"
-
-out=$(yaad list --type command)
-assert_contains "list --type command filters"      "$out" "docker run"
-assert_not_contains "list --type command excludes notes" "$out" "capital of France"
-
-out=$(yaad list --tag db)
-assert_contains "list --tag db shows tagged memory" "$out" "postgres"
 
 out=$(yaad list --remind)
 assert_contains "list --remind shows pending reminder" "$out" "conference ticket"
@@ -232,7 +214,7 @@ assert_contains "get non-existent ID returns error" "$out" "not found"
 section "delete: with --force flag"
 
 # Add a throwaway memory to delete
-del_out=$(yaad add "throwaway memory to delete" --type note)
+del_out=$(yaad add "throwaway memory to delete")
 DEL_ID=$(echo "$del_out" | grep "^saved" | awk '{print $2}')
 
 out=$(yaad delete "$DEL_ID" --force)
