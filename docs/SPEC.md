@@ -325,8 +325,11 @@ rememberit/
 │       └── notifier/
 │           ├── notifysend.go        # Linux notify-send
 │           └── stdout.go            # fallback stdout notifier
-├── SPEC.md
-├── PLAN.md
+├── docs/
+│   ├── SPEC.md
+│   ├── COMMANDS.md
+│   ├── REMINDERS.md
+│   └── CONFIG.md
 ├── go.mod
 └── go.sum
 ```

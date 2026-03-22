@@ -72,16 +72,16 @@ yaad can remind you of things right in your terminal when they're due.
 yaad add "submit PR for review" --remind "tomorrow 9am"
 ```
 
-See [REMINDERS.md](./REMINDERS.md) for setup (shell hook or systemd daemon).
+See [REMINDERS.md](./docs/REMINDERS.md) for setup (shell hook or systemd daemon).
 
 ---
 
 ## More
 
-- [COMMANDS.md](./COMMANDS.md) — full command reference (`list`, `get`, `delete`, `config`, all flags)
-- [REMINDERS.md](./REMINDERS.md) — reminder setup guide
-- [CONFIG.md](./CONFIG.md) — configuration keys, models, notifier options
-- [SPEC.md](./SPEC.md) — product specification and architecture
+- [COMMANDS.md](./docs/COMMANDS.md) — full command reference (`list`, `get`, `delete`, `config`, all flags)
+- [REMINDERS.md](./docs/REMINDERS.md) — reminder setup guide
+- [CONFIG.md](./docs/CONFIG.md) — configuration keys, models, notifier options
+- [SPEC.md](./docs/SPEC.md) — product specification and architecture
 
 ---
 
