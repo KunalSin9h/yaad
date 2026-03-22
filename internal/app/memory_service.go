@@ -17,9 +17,7 @@ import (
 type AddRequest struct {
 	Content    string
 	ForLabel   string
-	RemindExpr string           // natural language, e.g. "in 30 minutes"
-	TypeHint   domain.MemoryType // overrides AI detection when non-empty
-	ExtraTags  []string          // user-provided tags merged with AI tags
+	RemindExpr string // natural language, e.g. "in 30 minutes"
 }
 
 // MemoryService orchestrates memory creation and retrieval.
@@ -34,8 +32,7 @@ func NewMemoryService(store ports.StoragePort, ai ports.AIPort, timer ports.Time
 }
 
 // Add creates and persists a new memory.
-// AI enrichment (embedding, type detection, tag extraction) runs in parallel
-// and is non-fatal — the memory is saved even if Ollama is unavailable.
+// Embedding runs concurrently and is non-fatal — the memory saves even if Ollama is unavailable.
 func (s *MemoryService) Add(ctx context.Context, req AddRequest) (*domain.Memory, error) {
 	now := time.Now()
 
@@ -43,8 +40,6 @@ func (s *MemoryService) Add(ctx context.Context, req AddRequest) (*domain.Memory
 		ID:        newID(),
 		Content:   req.Content,
 		ForLabel:  req.ForLabel,
-		Type:      domain.MemoryTypeNote,
-		Tags:      req.ExtraTags,
 		CreatedAt: now,
 	}
 
@@ -63,18 +58,10 @@ func (s *MemoryService) Add(ctx context.Context, req AddRequest) (*domain.Memory
 			return nil, fmt.Errorf("parse remind time: %w", err)
 		}
 		m.RemindAt = t
-		if req.TypeHint == "" {
-			req.TypeHint = domain.MemoryTypeReminder
-		}
 	}
 
-	if req.TypeHint != "" {
-		m.Type = req.TypeHint
-	}
-
-	// Run AI enrichment concurrently. Errors are warned but never block the save.
+	// Embed concurrently — non-fatal if Ollama is unavailable.
 	g, gctx := errgroup.WithContext(ctx)
-
 	g.Go(func() error {
 		text := req.Content
 		if req.ForLabel != "" {
@@ -90,28 +77,7 @@ func (s *MemoryService) Add(ctx context.Context, req AddRequest) (*domain.Memory
 		m.Embedding = emb
 		return nil
 	})
-
-	if req.TypeHint == "" {
-		g.Go(func() error {
-			t, err := s.ai.DetectType(gctx, req.Content)
-			if err != nil {
-				return nil
-			}
-			m.Type = t
-			return nil
-		})
-	}
-
-	g.Go(func() error {
-		tags, err := s.ai.ExtractTags(gctx, req.Content, req.ForLabel)
-		if err != nil {
-			return nil
-		}
-		m.Tags = append(m.Tags, tags...)
-		return nil
-	})
-
-	_ = g.Wait() // all errors are non-fatal, handled inside goroutines
+	_ = g.Wait()
 
 	if err := s.store.Save(ctx, m); err != nil {
 		return nil, fmt.Errorf("save memory: %w", err)
