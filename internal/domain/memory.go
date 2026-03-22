@@ -6,9 +6,9 @@ import "time"
 type Memory struct {
 	ID         string
 	Content    string
-	ForLabel   string    // human context: "why did I save this?"
-	WorkingDir string    // cwd captured automatically at save time
-	Hostname   string    // machine identity
+	ForLabel   string // human context: "why did I save this?"
+	WorkingDir string // cwd captured automatically at save time
+	Hostname   string // machine identity
 	CreatedAt  time.Time
 	RemindAt   *time.Time // nil if not a reminder
 	RemindedAt *time.Time // nil until notification fires
