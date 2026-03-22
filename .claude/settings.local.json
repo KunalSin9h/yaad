@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "WebSearch"
+      "WebSearch",
+      "Bash(go build:*)",
+      "Bash(gofmt:*)",
+      "Bash(git commit:*)",
+      "Bash(git add:*)"
     ]
   }
 }
