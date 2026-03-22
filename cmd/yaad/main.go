@@ -130,8 +130,7 @@ func resolve(cmd *cobra.Command, flagName string, rc ports.ConfigPort, rcKey, de
 // --- add ---
 
 func addCmd(svc **app.MemoryService, db **sqliteadapter.DB) *cobra.Command {
-	var forLabel, remind, typeHint string
-	var tags []string
+	var forLabel, remind string
 
 	cmd := &cobra.Command{
 		Use:   "add <content>",
@@ -143,17 +142,11 @@ func addCmd(svc **app.MemoryService, db **sqliteadapter.DB) *cobra.Command {
 				Content:    args[0],
 				ForLabel:   forLabel,
 				RemindExpr: remind,
-				TypeHint:   domain.MemoryType(typeHint),
-				ExtraTags:  tags,
 			})
 			if err != nil {
 				return err
 			}
 			fmt.Printf("saved    %s\n", shortID(m.ID))
-			fmt.Printf("type     %s\n", m.Type)
-			if len(m.Tags) > 0 {
-				fmt.Printf("tags     %s\n", strings.Join(m.Tags, ", "))
-			}
 			if m.RemindAt != nil {
 				fmt.Printf("remind   %s\n", relTime(*m.RemindAt))
 			}
@@ -163,8 +156,6 @@ func addCmd(svc **app.MemoryService, db **sqliteadapter.DB) *cobra.Command {
 
 	cmd.Flags().StringVarP(&forLabel, "for", "f", "", "Context: why are you saving this?")
 	cmd.Flags().StringVar(&remind, "remind", "", `When to remind you, e.g. "in 30 minutes", "tomorrow 9am"`)
-	cmd.Flags().StringVar(&typeHint, "type", "", "Override type detection: command|note|reminder|url|fact")
-	cmd.Flags().StringArrayVar(&tags, "tag", nil, "Add a tag (repeatable: --tag docker --tag networking)")
 	return cmd
 }
 
@@ -189,7 +180,6 @@ func askCmd(svc **app.MemoryService) *cobra.Command {
 // --- list ---
 
 func listCmd(svc **app.MemoryService) *cobra.Command {
-	var typeFlag, tagFlag string
 	var limit int
 	var remindOnly bool
 
@@ -198,8 +188,6 @@ func listCmd(svc **app.MemoryService) *cobra.Command {
 		Short: "List saved memories",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			memories, err := (*svc).List(context.Background(), domain.ListFilter{
-				Type:          domain.MemoryType(typeFlag),
-				Tag:           tagFlag,
 				Limit:         limit,
 				OnlyReminders: remindOnly,
 			})
@@ -215,8 +203,6 @@ func listCmd(svc **app.MemoryService) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&typeFlag, "type", "", "Filter by type: command|note|reminder|url|fact")
-	cmd.Flags().StringVar(&tagFlag, "tag", "", "Filter by tag")
 	cmd.Flags().IntVar(&limit, "limit", 20, "Maximum results")
 	cmd.Flags().BoolVar(&remindOnly, "remind", false, "Show only pending reminders")
 	return cmd
@@ -450,12 +436,11 @@ func configCmd(rc *rcfile.Config, rcPath string) *cobra.Command {
 
 func printTable(memories []*domain.Memory) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	fmt.Fprintln(w, "ID\tTYPE\tCONTENT\tFOR\tCREATED")
-	fmt.Fprintln(w, "--\t----\t-------\t---\t-------")
+	fmt.Fprintln(w, "ID\tCONTENT\tFOR\tCREATED")
+	fmt.Fprintln(w, "--\t-------\t---\t-------")
 	for _, m := range memories {
-		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n",
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n",
 			shortID(m.ID),
-			m.Type,
 			truncate(m.Content, 50),
 			truncate(m.ForLabel, 30),
 			relTime(m.CreatedAt),
@@ -469,10 +454,6 @@ func printDetail(m *domain.Memory) {
 	fmt.Printf("Content  : %s\n", m.Content)
 	if m.ForLabel != "" {
 		fmt.Printf("For      : %s\n", m.ForLabel)
-	}
-	fmt.Printf("Type     : %s\n", m.Type)
-	if len(m.Tags) > 0 {
-		fmt.Printf("Tags     : %s\n", strings.Join(m.Tags, ", "))
 	}
 	fmt.Printf("Created  : %s (%s)\n", m.CreatedAt.Format(time.RFC822), relTime(m.CreatedAt))
 	if m.WorkingDir != "" {

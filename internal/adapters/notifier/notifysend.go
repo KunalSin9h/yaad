@@ -2,7 +2,6 @@ package notifier
 
 import (
 	"context"
-	"fmt"
 	"os/exec"
 
 	"github.com/kunalsin9h/yaad/internal/domain"
@@ -29,7 +28,7 @@ func IsAvailable() bool {
 }
 
 func (n *NotifySend) Notify(ctx context.Context, m *domain.Memory) error {
-	title := fmt.Sprintf("yaad [%s]", m.Type)
+	title := "yaad reminder"
 	body := m.Content
 	if m.ForLabel != "" {
 		body += "\n" + m.ForLabel
