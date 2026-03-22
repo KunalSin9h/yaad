@@ -367,7 +367,7 @@ func configCmd(rc *rcfile.Config, rcPath string) *cobra.Command {
 				fmt.Println("edit it with your preferred text editor to configure yaad.")
 				fmt.Println()
 				fmt.Println("tip: yaad can remind you about memories.")
-				fmt.Println("     to set up CLI reminders, see: https://github.com/KunalSin9h/yaad?tab=readme-ov-file#reminders")
+				fmt.Println("     to set up CLI reminders, see: https://github.com/KunalSin9h/yaad/blob/main/docs/REMINDERS.md")
 				return nil
 			},
 		},
