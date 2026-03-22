@@ -70,69 +70,13 @@ func (c *Client) Embed(ctx context.Context, text string) ([]float32, error) {
 	return out, nil
 }
 
-func (c *Client) DetectType(ctx context.Context, content string) (domain.MemoryType, error) {
-	prompt := fmt.Sprintf(
-		`Classify the following text into exactly one category: command, note, reminder, url, fact.
-Reply with only the single word category, nothing else.
-Text: %q`,
-		content,
-	)
-
-	result, err := c.chat(ctx, prompt)
-	if err != nil {
-		return domain.MemoryTypeNote, err
-	}
-
-	switch strings.TrimSpace(strings.ToLower(result)) {
-	case "command":
-		return domain.MemoryTypeCommand, nil
-	case "reminder":
-		return domain.MemoryTypeReminder, nil
-	case "url":
-		return domain.MemoryTypeURL, nil
-	case "fact":
-		return domain.MemoryTypeFact, nil
-	default:
-		return domain.MemoryTypeNote, nil
-	}
-}
-
-func (c *Client) ExtractTags(ctx context.Context, content, forLabel string) ([]string, error) {
-	prompt := fmt.Sprintf(
-		`Extract 2-5 short keyword tags from the text below.
-Return only a JSON array of lowercase strings, nothing else.
-Example output: ["docker","networking","port"]
-Text: %q
-Context: %q`,
-		content, forLabel,
-	)
-
-	result, err := c.chat(ctx, prompt)
-	if err != nil {
-		return nil, err
-	}
-
-	// Extract the JSON array from the response robustly.
-	start := strings.Index(result, "[")
-	end := strings.LastIndex(result, "]")
-	if start == -1 || end == -1 || end <= start {
-		return []string{}, nil
-	}
-
-	var tags []string
-	if err := json.Unmarshal([]byte(result[start:end+1]), &tags); err != nil {
-		return []string{}, nil
-	}
-	return tags, nil
-}
-
 func (c *Client) Answer(ctx context.Context, question string, memories []*domain.Memory) (string, error) {
 	var sb strings.Builder
 	sb.WriteString("You are a personal memory assistant. Answer the user's question using only their saved memories below.\n")
 	sb.WriteString("Be concise and direct. If the answer is in the memories, quote the relevant content.\n\n")
 	sb.WriteString("Saved memories:\n")
 	for i, m := range memories {
-		sb.WriteString(fmt.Sprintf("%d. [%s] %s", i+1, m.Type, m.Content))
+		sb.WriteString(fmt.Sprintf("%d. %s", i+1, m.Content))
 		if m.ForLabel != "" {
 			sb.WriteString(fmt.Sprintf(" (context: %s)", m.ForLabel))
 		}
