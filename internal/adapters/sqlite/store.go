@@ -5,7 +5,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/gob"
-	"encoding/json"
 	"fmt"
 	"math"
 	"sort"
@@ -24,10 +23,6 @@ type Store struct {
 }
 
 func (s *Store) Save(ctx context.Context, m *domain.Memory) error {
-	tags, err := json.Marshal(m.Tags)
-	if err != nil {
-		return fmt.Errorf("marshal tags: %w", err)
-	}
 	emb, err := encodeEmbedding(m.Embedding)
 	if err != nil {
 		return fmt.Errorf("encode embedding: %w", err)
@@ -35,18 +30,16 @@ func (s *Store) Save(ctx context.Context, m *domain.Memory) error {
 
 	_, err = s.db.ExecContext(ctx, `
 		INSERT INTO memories
-			(id, content, for_label, type, tags, working_dir, hostname, created_at, remind_at, reminded_at, embedding)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			(id, content, for_label, working_dir, hostname, created_at, remind_at, reminded_at, embedding)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(id) DO UPDATE SET
 			content     = excluded.content,
 			for_label   = excluded.for_label,
-			type        = excluded.type,
-			tags        = excluded.tags,
 			remind_at   = excluded.remind_at,
 			reminded_at = excluded.reminded_at,
 			embedding   = excluded.embedding
 	`,
-		m.ID, m.Content, m.ForLabel, string(m.Type), string(tags),
+		m.ID, m.Content, m.ForLabel,
 		m.WorkingDir, m.Hostname, m.CreatedAt, m.RemindAt, m.RemindedAt, emb,
 	)
 	return err
@@ -62,7 +55,7 @@ func (s *Store) GetByID(ctx context.Context, id string) (*domain.Memory, error) 
 		arg = id + "%"
 	}
 	row := s.db.QueryRowContext(ctx, `
-		SELECT id, content, for_label, type, tags, working_dir, hostname,
+		SELECT id, content, for_label, working_dir, hostname,
 		       created_at, remind_at, reminded_at, embedding
 		FROM memories WHERE `+col+` LIMIT 1`, arg)
 	return scanRow(row)
@@ -70,19 +63,11 @@ func (s *Store) GetByID(ctx context.Context, id string) (*domain.Memory, error) 
 
 func (s *Store) List(ctx context.Context, filter domain.ListFilter) ([]*domain.Memory, error) {
 	q := `
-		SELECT id, content, for_label, type, tags, working_dir, hostname,
+		SELECT id, content, for_label, working_dir, hostname,
 		       created_at, remind_at, reminded_at, embedding
 		FROM memories WHERE 1=1`
 	args := []any{}
 
-	if filter.Type != "" {
-		q += " AND type = ?"
-		args = append(args, string(filter.Type))
-	}
-	if filter.Tag != "" {
-		q += " AND tags LIKE ?"
-		args = append(args, "%"+filter.Tag+"%")
-	}
 	if filter.OnlyReminders {
 		q += " AND remind_at IS NOT NULL AND reminded_at IS NULL"
 	}
@@ -142,7 +127,7 @@ func (s *Store) DeleteAll(ctx context.Context) (int64, error) {
 // when scale demands it.
 func (s *Store) FindSimilar(ctx context.Context, embedding []float32, topK int) ([]*domain.Memory, error) {
 	rows, err := s.db.QueryContext(ctx, `
-		SELECT id, content, for_label, type, tags, working_dir, hostname,
+		SELECT id, content, for_label, working_dir, hostname,
 		       created_at, remind_at, reminded_at, embedding
 		FROM memories WHERE embedding IS NOT NULL`)
 	if err != nil {
@@ -186,7 +171,7 @@ func (s *Store) FindSimilar(ctx context.Context, embedding []float32, topK int) 
 
 func (s *Store) PendingReminders(ctx context.Context, before time.Time) ([]*domain.Memory, error) {
 	rows, err := s.db.QueryContext(ctx, `
-		SELECT id, content, for_label, type, tags, working_dir, hostname,
+		SELECT id, content, for_label, working_dir, hostname,
 		       created_at, remind_at, reminded_at, embedding
 		FROM memories
 		WHERE remind_at IS NOT NULL AND reminded_at IS NULL AND remind_at <= ?`,
@@ -223,12 +208,11 @@ type rowScanner interface {
 
 func scanRow(s rowScanner) (*domain.Memory, error) {
 	var m domain.Memory
-	var tagsJSON, memType string
 	var embBlob []byte
 	var remindAt, remindedAt sql.NullTime
 
 	err := s.Scan(
-		&m.ID, &m.Content, &m.ForLabel, &memType, &tagsJSON,
+		&m.ID, &m.Content, &m.ForLabel,
 		&m.WorkingDir, &m.Hostname, &m.CreatedAt,
 		&remindAt, &remindedAt, &embBlob,
 	)
@@ -239,11 +223,6 @@ func scanRow(s rowScanner) (*domain.Memory, error) {
 		return nil, err
 	}
 
-	m.Type = domain.MemoryType(memType)
-
-	if err := json.Unmarshal([]byte(tagsJSON), &m.Tags); err != nil {
-		m.Tags = []string{}
-	}
 	if remindAt.Valid {
 		m.RemindAt = &remindAt.Time
 	}

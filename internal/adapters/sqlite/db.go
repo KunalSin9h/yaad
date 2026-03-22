@@ -12,8 +12,6 @@ CREATE TABLE IF NOT EXISTS memories (
 	id          TEXT PRIMARY KEY,
 	content     TEXT NOT NULL,
 	for_label   TEXT NOT NULL DEFAULT '',
-	type        TEXT NOT NULL DEFAULT 'note',
-	tags        TEXT NOT NULL DEFAULT '[]',
 	working_dir TEXT NOT NULL DEFAULT '',
 	hostname    TEXT NOT NULL DEFAULT '',
 	created_at  DATETIME NOT NULL,
@@ -22,7 +20,6 @@ CREATE TABLE IF NOT EXISTS memories (
 	embedding   BLOB
 );
 
-CREATE INDEX IF NOT EXISTS idx_memories_type       ON memories(type);
 CREATE INDEX IF NOT EXISTS idx_memories_remind_at  ON memories(remind_at) WHERE remind_at IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_memories_created_at ON memories(created_at DESC);
 
