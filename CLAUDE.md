@@ -25,7 +25,7 @@ Lore is a **Ports & Adapters (Hexagonal)** app. Business logic never imports inf
 
 ```
 cmd/yaad/main.go          ← CLI (Cobra), DI wiring, output formatting
-internal/domain/          ← Memory struct, MemoryType enum, sentinel errors
+internal/domain/          ← Memory struct, sentinel errors
 internal/ports/           ← Interfaces only: StoragePort, AIPort, TimeParserPort, NotifierPort, ConfigPort
 internal/app/             ← MemoryService, ReminderService (depend only on ports)
 internal/adapters/
@@ -41,7 +41,7 @@ internal/testutil/mocks.go ← Mock implementations for all ports
 
 ## Key Behaviors
 
-- **Ollama is optional**: `MemoryService.Add()` runs Embed/DetectType/ExtractTags concurrently via `errgroup`, but gracefully degrades if Ollama is unavailable — the memory saves without enrichment.
+- **Ollama is optional**: `MemoryService.Add()` runs `Embed` concurrently via `errgroup`, but gracefully degrades if Ollama is unavailable — the memory saves without an embedding.
 - **Vector search is in-process**: `FindSimilar()` loads all embeddings and computes cosine similarity in Go. Swappable via `StoragePort`.
 - **ULID prefix matching**: `GetByID` accepts 10-char prefixes of the full 26-char ULID.
 - **Reminder daemon**: `yaad daemon` runs a poll loop intended for use as a systemd user service.

@@ -39,7 +39,7 @@ notifier = cli
 |---|---|---|
 | `ollama.url` | `http://localhost:11434` | Ollama server URL |
 | `ollama.embed_model` | `mxbai-embed-large` | Model for generating embeddings |
-| `ollama.chat_model` | `llama3.2:3b` | Model for query answering and type detection |
+| `ollama.chat_model` | `llama3.2:3b` | Model for answering `yaad ask` queries |
 | `reminder.poll_interval` | `30s` | How often the daemon polls for due reminders |
 | `notifier` | `cli` | Notifier adapter(s), comma-separated |
 

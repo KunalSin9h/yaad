@@ -19,8 +19,6 @@ Memory {
   id          ULID            // sortable, unique
   content     string          // the actual thing you want to remember
   for         string          // human context: "why did I save this?"
-  type        MemoryType      // auto-detected by AI
-  tags        []string        // AI-extracted keywords
   working_dir string          // cwd at time of save
   hostname    string          // machine identity
   created_at  time.Time
@@ -29,18 +27,6 @@ Memory {
   embedding   []float32       // vector for semantic search
 }
 ```
-
-### Memory Types
-
-| Type | Example |
-|---|---|
-| `command` | `claude --resume 17a43487-...` |
-| `note` | `postgres runs on port 5433 in staging` |
-| `reminder` | `book conference ticket before 8 PM` |
-| `url` | `https://pkg.go.dev/...` |
-| `fact` | `AWS account ID for prod is 123456789` |
-
-Type is auto-detected by the AI on `add`. User can override with `--type`.
 
 ---
 
@@ -54,8 +40,6 @@ yaad add "<content>" [flags]
 Flags:
   --for, -f   string   Human context / purpose label
   --remind    string   Natural language time: "in 30 minutes", "tomorrow 9am"
-  --type      string   Override AI type detection
-  --tag       string   Additional tag (repeatable)
 ```
 
 Examples:
@@ -65,9 +49,6 @@ yaad add "claude --resume 17a43487-5ce9-4fd3-a9b5-b099d335f644" \
 
 yaad add "book conference ticket" \
   --remind "in 30 minutes"
-
-yaad add "postgres password is hunter2" \
-  --for "staging env" --tag secrets
 ```
 
 ### `yaad ask`
@@ -91,8 +72,6 @@ yaad ask "what was that postgres port number?"
 yaad list [flags]
 
 Flags:
-  --type    string   Filter by memory type
-  --tag     string   Filter by tag
   --limit   int      Max results (default: 20)
   --remind         Show only pending reminders
 ```
@@ -190,8 +169,6 @@ type StoragePort interface {
 // AIPort — all intelligence operations
 type AIPort interface {
     Embed(ctx context.Context, text string) ([]float32, error)
-    DetectType(ctx context.Context, content string) (MemoryType, error)
-    ExtractTags(ctx context.Context, content, forLabel string) ([]string, error)
     Answer(ctx context.Context, question string, memories []*Memory) (string, error)
 }
 
@@ -246,8 +223,6 @@ CREATE TABLE memories (
     id          TEXT PRIMARY KEY,
     content     TEXT NOT NULL,
     for_label   TEXT,
-    type        TEXT NOT NULL DEFAULT 'note',
-    tags        TEXT,              -- JSON array
     working_dir TEXT,
     hostname    TEXT,
     created_at  DATETIME NOT NULL,
@@ -261,7 +236,6 @@ CREATE TABLE config (
     value TEXT NOT NULL
 );
 
-CREATE INDEX idx_memories_type       ON memories(type);
 CREATE INDEX idx_memories_remind_at  ON memories(remind_at) WHERE remind_at IS NOT NULL;
 CREATE INDEX idx_memories_created_at ON memories(created_at DESC);
 ```
@@ -272,9 +246,6 @@ CREATE INDEX idx_memories_created_at ON memories(created_at DESC);
 
 ### On `add`
 1. Call `AIPort.Embed(content + " " + forLabel)` — store embedding
-2. Call `AIPort.DetectType(content)` — unless `--type` overridden
-3. Call `AIPort.ExtractTags(content, forLabel)` — enrich metadata
-4. All three calls can be parallelized (goroutines)
 
 ### On `ask`
 1. Embed the question
@@ -333,7 +304,7 @@ rememberit/
 │       └── main.go                  # entry point, wire everything
 ├── internal/
 │   ├── domain/
-│   │   ├── memory.go                # Memory struct, MemoryType, ListFilter
+│   │   ├── memory.go                # Memory struct, ListFilter
 │   │   └── errors.go                # domain errors
 │   ├── ports/
 │   │   ├── storage.go               # StoragePort interface

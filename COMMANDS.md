@@ -5,8 +5,6 @@
 ```bash
 yaad add "<content>"
 yaad add "<content>" --remind "when"
-yaad add "<content>" --type command|note|url|fact|reminder
-yaad add "<content>" --tag <tag>      # repeatable
 ```
 
 Put context directly in the content — the AI embeds the full string, so searchable context belongs there:
@@ -16,7 +14,6 @@ Put context directly in the content — the AI embeds the full string, so search
 yaad add "staging db is postgres on port 5433"
 yaad add "prod login: ssh -i ~/.ssh/id_rsa user@bastion.internal"
 yaad add "API rate limit is 100 req/min per token"
-yaad add "stripe charges API: https://docs.stripe.com/api/charges" --tag stripe
 yaad add "deploy checklist: run migrations, restart workers, clear cache"
 yaad add "submit PR for review" --remind "tomorrow 9am"
 
@@ -37,8 +34,6 @@ yaad ask "do I have anything due tonight?"
 
 ```bash
 yaad list                   # 20 most recent
-yaad list --type command    # filter by type
-yaad list --tag postgres    # filter by tag
 yaad list --remind          # pending reminders only
 yaad list --limit 50
 ```
