@@ -17,10 +17,8 @@ import (
 // MockAI implements ports.AIPort for testing.
 // Override individual Fn fields to inject specific behaviour.
 type MockAI struct {
-	EmbedFn       func(ctx context.Context, text string) ([]float32, error)
-	DetectTypeFn  func(ctx context.Context, content string) (domain.MemoryType, error)
-	ExtractTagsFn func(ctx context.Context, content, forLabel string) ([]string, error)
-	AnswerFn      func(ctx context.Context, question string, memories []*domain.Memory) (string, error)
+	EmbedFn  func(ctx context.Context, text string) ([]float32, error)
+	AnswerFn func(ctx context.Context, question string, memories []*domain.Memory) (string, error)
 }
 
 var _ ports.AIPort = (*MockAI)(nil)
@@ -30,20 +28,6 @@ func (m *MockAI) Embed(ctx context.Context, text string) ([]float32, error) {
 		return m.EmbedFn(ctx, text)
 	}
 	return []float32{0.1, 0.2, 0.3}, nil
-}
-
-func (m *MockAI) DetectType(ctx context.Context, content string) (domain.MemoryType, error) {
-	if m.DetectTypeFn != nil {
-		return m.DetectTypeFn(ctx, content)
-	}
-	return domain.MemoryTypeNote, nil
-}
-
-func (m *MockAI) ExtractTags(ctx context.Context, content, forLabel string) ([]string, error) {
-	if m.ExtractTagsFn != nil {
-		return m.ExtractTagsFn(ctx, content, forLabel)
-	}
-	return []string{"test"}, nil
 }
 
 func (m *MockAI) Answer(ctx context.Context, question string, memories []*domain.Memory) (string, error) {
@@ -76,7 +60,7 @@ func (m *MockTimeParser) Parse(expr string, from time.Time) (*time.Time, error) 
 // MockNotifier implements ports.NotifierPort for testing.
 // It records all fired memories so tests can assert on them.
 type MockNotifier struct {
-	Fired  []*domain.Memory
+	Fired    []*domain.Memory
 	NotifyFn func(ctx context.Context, m *domain.Memory) error
 }
 
